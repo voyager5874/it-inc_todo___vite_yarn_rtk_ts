@@ -16,4 +16,6 @@ export enum TaskPriority {
 export enum RequestResultCode {
   Success,
   Error,
+  // eslint-disable-next-line no-magic-numbers
+  CaptchaRequired = 10,
 }

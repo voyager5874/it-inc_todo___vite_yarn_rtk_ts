@@ -1,10 +1,21 @@
-import { ReactElement } from 'react';
+import type { MouseEvent, ReactElement } from 'react';
+import { useState } from 'react';
 
-import { Button, TextField } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { LoginParamsType } from 'services/api/types';
+import { useAppDispatch } from 'app/hooks';
+import { serviceLogin } from 'features/user/userSlice';
+import type { LoginParamsType } from 'services/api/types';
 
 const validationSchema = yup.object({
   email: yup.string().email('Enter a valid email').required('Email is required'),
@@ -15,24 +26,45 @@ const validationSchema = yup.object({
 });
 
 const initialValues: LoginParamsType = {
-  email: '',
-  password: '',
+  email: import.meta.env.VITE_MY_EMAIL || '',
+  password: import.meta.env.VITE_MY_PASSWORD || '',
   rememberMe: true,
 };
 
 export const LoginForm = (): ReactElement => {
+  const dispatch = useAppDispatch();
+
+  const [showPassword, setShowPassword] = useState(false);
+
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: values => {
-      // eslint-disable-next-line no-magic-numbers,no-alert
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async (values, helpers) => {
+      // helpers.setSubmitting(true);
+      await dispatch(serviceLogin(values));
+      helpers.setSubmitting(false);
     },
   });
 
+  const toggleShowPassword = (): void => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>): void => {
+    event.preventDefault();
+  };
+
   return (
     <div>
-      <form onSubmit={formik.handleSubmit}>
+      <form
+        onSubmit={formik.handleSubmit}
+        style={{
+          width: '500px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '30px',
+        }}
+      >
         <TextField
           fullWidth
           id="email"
@@ -48,13 +80,66 @@ export const LoginForm = (): ReactElement => {
           id="password"
           name="password"
           label="Password"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           value={formik.values.password}
           onChange={formik.handleChange}
           error={formik.touched.password && Boolean(formik.errors.password)}
           helperText={formik.touched.password && formik.errors.password}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                {' '}
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={toggleShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
-        <Button color="primary" variant="contained" fullWidth type="submit">
+        {/* <FormControl sx={{ m: 1 }} variant="outlined"> */}
+        {/*  <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel> */}
+        {/*  <OutlinedInput */}
+        {/*    id="outlined-adornment-password" */}
+        {/*    type={showPassword ? 'text' : 'password'} */}
+        {/*    value={formik.values.password} */}
+        {/*    onChange={formik.handleChange} */}
+        {/*    endAdornment={ */}
+        {/*      <InputAdornment position="end"> */}
+        {/*        <IconButton */}
+        {/*          aria-label="toggle password visibility" */}
+        {/*          onClick={toggleShowPassword} */}
+        {/*          onMouseDown={handleMouseDownPassword} */}
+        {/*          edge="end" */}
+        {/*        > */}
+        {/*          {showPassword ? <VisibilityOff /> : <Visibility />} */}
+        {/*        </IconButton> */}
+        {/*      </InputAdornment> */}
+        {/*    } */}
+        {/*    label="Password" */}
+        {/*  /> */}
+        {/* </FormControl> */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="rememberMe"
+              onChange={formik.handleChange}
+              checked={formik.values.rememberMe}
+            />
+          }
+          label="remember me"
+        />
+        <Button
+          color="primary"
+          variant="contained"
+          fullWidth
+          type="submit"
+          disabled={formik.isSubmitting}
+        >
           Submit
         </Button>
       </form>

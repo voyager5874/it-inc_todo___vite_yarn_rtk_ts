@@ -13,3 +13,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     </Provider>
   </React.StrictMode>,
 );
+
+// @ts-ignore
+window.store = store;

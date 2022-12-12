@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const baseApiInstance = axios.create({
+export const baseAxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
   headers: {
@@ -8,7 +8,7 @@ export const baseApiInstance = axios.create({
   },
 });
 
-export const extrasApiInstance = axios.create({
+export const extrasAxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_SOCIAL_NETWORK_BASE_URL,
   withCredentials: true,
   headers: {
