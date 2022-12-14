@@ -1,8 +1,15 @@
 import type { ReactElement } from 'react';
-import { useEffect } from 'react';
+import { createContext, useEffect, useMemo, useState } from 'react';
 
-import './App.css';
-import { Box, CircularProgress, CssBaseline } from '@mui/material';
+import type { PaletteMode } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+  useMediaQuery,
+} from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { selectAppInitializationStatus } from 'app/appSlice';
@@ -52,15 +59,41 @@ const router = createBrowserRouter([
   },
 ]);
 
+export const ColorModeContext = createContext({ toggleColorMode: () => {} });
+
 export const App = (): ReactElement => {
   const appIsInitialized = useAppSelector(state => selectAppInitializationStatus(state));
   const dispatch = useAppDispatch();
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [colorMode, setColorMode] = useState<PaletteMode>(
+    prefersDarkMode ? 'dark' : 'light',
+  );
+
+  const toggleTheme = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setColorMode(prevMode => (prevMode === 'light' ? 'dark' : 'light'));
+      },
+    }),
+    [],
+  );
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: colorMode,
+        },
+      }),
+    [colorMode],
+  );
 
   useEffect(() => {
     if (!appIsInitialized) {
       dispatch(authenticateUser());
     }
   });
+
   if (!appIsInitialized) {
     return (
       <Box sx={{ position: 'fixed', top: '30%', textAlign: 'center', width: '100%' }}>
@@ -70,9 +103,11 @@ export const App = (): ReactElement => {
   }
 
   return (
-    <>
-      <CssBaseline />
-      <RouterProvider router={router} />;
-    </>
+    <ColorModeContext.Provider value={toggleTheme}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 };

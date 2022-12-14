@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
-import { Container } from '@mui/material';
-import Grid2 from '@mui/material/Unstable_Grid2';
+import { Box, Button, Stack } from '@mui/material';
+import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { fetchGoals, GoalCard, selectAllGoals } from 'features/goals';
@@ -16,15 +16,36 @@ export const GoalsPage = (): ReactElement => {
   }, []);
 
   return (
-    <Container sx={{ padding: '50px' }}>
-      <h2>Goals page </h2>
-      <Grid2 container>
-        <Grid2 sx={{ display: 'flex', gap: '20px' }}>
-          {goals.map(goal => (
-            <GoalCard {...goal} key={goal.id} />
-          ))}
-        </Grid2>
-      </Grid2>
-    </Container>
+    <SimpleBar
+      autoHide={false}
+      style={{
+        backgroundColor: 'bisque',
+        marginRight: '20px',
+        marginLeft: '20px',
+        padding: '20px',
+        maxHeight: '90%',
+      }}
+    >
+      <Stack
+        direction="row"
+        justifyContent="flex-start"
+        alignItems="flex-start"
+        spacing={2}
+        sx={{
+          width: 'fit-content',
+          minHeight: '90vh',
+          border: '2px solid teal',
+        }}
+      >
+        {goals.map(goal => (
+          <GoalCard {...goal} key={goal.id} />
+        ))}
+        <Box sx={{ minWidth: '300px' }}>
+          <Button fullWidth variant="contained">
+            Add Column
+          </Button>
+        </Box>
+      </Stack>
+    </SimpleBar>
   );
 };

@@ -6,7 +6,7 @@ import { goalsAPI } from 'services/api/goalsAPI';
 import type { GoalServerModelType } from 'services/api/types';
 
 const goalsAdapter = createEntityAdapter<GoalServerModelType>({
-  sortComparer: (a, b) => a.title.localeCompare(b.title),
+  sortComparer: (a, b) => a.order - b.order,
 });
 
 export const fetchGoals = createAsyncThunk('goals/fetchGoals', async () => {

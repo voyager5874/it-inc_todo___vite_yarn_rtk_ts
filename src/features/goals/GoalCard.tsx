@@ -1,7 +1,8 @@
 import type { FC, ReactElement } from 'react';
 import { useEffect } from 'react';
 
-import { Paper } from '@mui/material';
+import { List, ListItem, Paper, Typography } from '@mui/material';
+import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import type { GoalEntityAppType } from 'features/goals/types';
@@ -16,13 +17,19 @@ export const GoalCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
   }, [id]);
 
   return (
-    <Paper sx={{ width: '300px' }}>
-      <h3>{title}</h3>
-      <ul>
-        {(tasks || []).map(task => (
-          <h5 key={task.id}>{task.title}</h5>
-        ))}
-      </ul>
+    <Paper
+      sx={{ minWidth: '300px', padding: '20px', maxHeight: '90vh', maxWidth: '400px' }}
+    >
+      <Typography variant="h5" sx={{ backgroundColor: 'background.default' }}>
+        {title}
+      </Typography>
+      <List sx={{ overflowY: 'auto', backgroundColor: 'red' }}>
+        <SimpleBar autoHide={false} style={{ maxHeight: '80vh' }}>
+          {(tasks || []).map(task => (
+            <ListItem key={task.id}>{task.title}</ListItem>
+          ))}
+        </SimpleBar>
+      </List>
     </Paper>
   );
 };

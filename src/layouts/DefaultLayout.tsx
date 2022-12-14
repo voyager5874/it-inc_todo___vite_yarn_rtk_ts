@@ -1,5 +1,5 @@
 import type { MouseEvent, ReactElement } from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { AccountCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Navigate, NavLink, Outlet } from 'react-router-dom';
 
+import { ColorModeContext } from 'app/App';
 import { useAppSelector } from 'app/hooks';
 
 const pages = ['user', 'goals'];
@@ -23,7 +24,7 @@ const pages = ['user', 'goals'];
 export const DefaultLayout = (): ReactElement => {
   const auth = useAppSelector(state => state.user.auth);
   const avatar = useAppSelector(state => state.user.photoLarge);
-
+  const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -43,7 +44,7 @@ export const DefaultLayout = (): ReactElement => {
   }
 
   return (
-    <Box sx={{ backgroundColor: 'red', minHeight: '100vh' }}>
+    <Box sx={{ border: '2px solid red', minHeight: '99vh' }}>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -105,6 +106,7 @@ export const DefaultLayout = (): ReactElement => {
               >
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                 <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={colorMode.toggleColorMode}>toggle theme</MenuItem>
               </Menu>
             </div>
           )}

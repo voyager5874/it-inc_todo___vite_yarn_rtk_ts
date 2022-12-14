@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
+  Box,
   Button,
   Checkbox,
   FormControlLabel,
@@ -55,7 +56,7 @@ export const LoginForm = (): ReactElement => {
   };
 
   return (
-    <div>
+    <Box>
       <form
         onSubmit={formik.handleSubmit}
         style={{
@@ -143,6 +144,6 @@ export const LoginForm = (): ReactElement => {
           Submit
         </Button>
       </form>
-    </div>
+    </Box>
   );
 };

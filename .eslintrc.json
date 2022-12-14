@@ -82,7 +82,7 @@
         "no-debugger": "warn",
         "no-unused-vars": "off",
         "no-magic-numbers": [
-            "error",
+            "warn",
             {
                 "ignore": [
                     0,

@@ -13,7 +13,11 @@ const tasksAdapter = createEntityAdapter<TaskServerModelType>({
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (id: string) => {
   const response = await tasksAPI.getTasks(id);
 
-  return response.items;
+  // if (id === '44537b83-cd7a-4aae-86bf-0d517a4e058d') {
+  //   debugger;
+  // }
+
+  return { tasks: response.items, goalId: id };
 });
 
 const initialState = tasksAdapter.getInitialState({
@@ -36,10 +40,10 @@ const tasksSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(fetchTasks.fulfilled, (state, action) => {
-      const tasks = action.payload;
+      const { tasks } = action.payload;
 
       tasksAdapter.upsertMany(state, tasks);
-      state.sortedByGoalId[tasks[0].todoListId] = tasks;
+      state.sortedByGoalId[action.payload.goalId] = tasks;
     });
   },
 });
