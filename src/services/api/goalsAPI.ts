@@ -1,11 +1,19 @@
 import { baseAxiosInstance } from './axiosConfig';
 
-import type { TodoListsEndpointGetResponseType } from 'services/api/types';
+import type {
+  TodoListsEndpointGetResponseType,
+  TodoListsEndpointPostResponseType,
+} from 'services/api/types';
 
 export const goalsAPI = {
   getGoals() {
     return baseAxiosInstance
       .get<TodoListsEndpointGetResponseType>('todo-lists')
+      .then(res => res.data);
+  },
+  createGoal(title: string) {
+    return baseAxiosInstance
+      .post<TodoListsEndpointPostResponseType>('todo-lists', { title })
       .then(res => res.data);
   },
   // createGoal(title: string) {

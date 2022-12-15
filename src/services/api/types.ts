@@ -85,6 +85,10 @@ export type GoalServerModelType = {
 
 export type TodoListsEndpointGetResponseType = GoalServerModelType[];
 
+export type TodoListsEndpointPostResponseType = FormSubmitResponseType<{
+  item: GoalServerModelType;
+}>;
+
 export type PutAvatarResponseType = {
   photos: {
     small: string;

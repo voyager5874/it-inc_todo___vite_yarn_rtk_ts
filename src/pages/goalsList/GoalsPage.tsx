@@ -6,7 +6,7 @@ import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
-import { fetchGoals, GoalCard, selectAllGoals } from 'features/goals';
+import { addGoal, fetchGoals, GoalCard, selectAllGoals } from 'features/goals';
 
 export const GoalsPage = (): ReactElement => {
   const goals = useAppSelector(selectAllGoals);
@@ -17,7 +17,7 @@ export const GoalsPage = (): ReactElement => {
   }, [dispatch]);
 
   const handleAddColumn = (title: string): void => {
-    console.log(title);
+    dispatch(addGoal(title));
   };
 
   return (

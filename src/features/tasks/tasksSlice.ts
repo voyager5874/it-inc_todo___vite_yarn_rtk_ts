@@ -2,6 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
+import { addGoal } from 'features/goals';
 import type {
   CreateTaskThunkArgType,
   UpdateTaskThunkArgType,
@@ -98,6 +99,11 @@ const tasksSlice = createSlice({
         if (taskToUpdate) {
           taskToUpdate = taskData;
         }
+      })
+      .addCase(addGoal.fulfilled, (state, action) => {
+        const { id } = action.payload;
+
+        state.sortedByGoalId[id] = [];
       });
   },
 });
