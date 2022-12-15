@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
-import { Container } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from 'app/hooks';
@@ -17,16 +17,16 @@ export const LoginPage = (): ReactElement => {
   }, [auth, navigate]);
 
   return (
-    <Container
+    <Stack
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      spacing={2}
       sx={{
-        backgroundColor: 'grey',
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        minHeight: '99vh',
       }}
     >
       <LoginForm />
-    </Container>
+    </Stack>
   );
 };

@@ -63,6 +63,19 @@ export type TasksEndpointGetResponseType = {
   error: string | null;
 };
 
+export type TaskEndpointPostPutModelDataType = {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  startDate?: string | null;
+  deadline?: string | null;
+};
+
+export type TaskEndpointPostPutResponseType = FormSubmitResponseType<{
+  item: TaskServerModelType;
+}>;
+
 export type GoalServerModelType = {
   id: string;
   title: string;

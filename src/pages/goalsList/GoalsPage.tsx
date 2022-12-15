@@ -1,10 +1,11 @@
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
-import { Box, Button, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { AddItem } from 'components/AddItem/AddItem';
 import { fetchGoals, GoalCard, selectAllGoals } from 'features/goals';
 
 export const GoalsPage = (): ReactElement => {
@@ -13,13 +14,16 @@ export const GoalsPage = (): ReactElement => {
 
   useEffect(() => {
     dispatch(fetchGoals());
-  }, []);
+  }, [dispatch]);
+
+  const handleAddColumn = (title: string): void => {
+    console.log(title);
+  };
 
   return (
     <SimpleBar
       autoHide={false}
       style={{
-        backgroundColor: 'bisque',
         marginRight: '20px',
         marginLeft: '20px',
         padding: '20px',
@@ -40,11 +44,7 @@ export const GoalsPage = (): ReactElement => {
         {goals.map(goal => (
           <GoalCard {...goal} key={goal.id} />
         ))}
-        <Box sx={{ minWidth: '300px' }}>
-          <Button fullWidth variant="contained">
-            Add Column
-          </Button>
-        </Box>
+        <AddItem buttonName="Add column" callback={handleAddColumn} />
       </Stack>
     </SimpleBar>
   );

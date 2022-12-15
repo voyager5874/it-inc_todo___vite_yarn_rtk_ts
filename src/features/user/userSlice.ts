@@ -1,32 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import type { UserInAppType } from 'features/user/types';
-import { createAuthAsyncThunk } from 'features/user/types';
 import { RequestResultCode } from 'services/api/enums';
 import type { LoginParamsType } from 'services/api/types';
 import { userAPI } from 'services/api/userAPI';
-
-// export const authorizeUser = createAuthAsyncThunk(
-//   'user/auth',
-//   async (_, { rejectWithValue }) => {
-//     try {
-//       const response = await userAPI.authMe();
-//
-//       if (response.resultCode === RequestResultCode.Success) {
-//         return response.data;
-//       }
-//       rejectWithValue({
-//         messages: response.messages,
-//         fieldsErrors: response.fieldsErrors,
-//       });
-//     } catch (error) {
-//       rejectWithValue({
-//         messages: [isAxiosError(error) ? error.message : 'network error'],
-//         fieldsErrors: [],
-//       });
-//     }
-//   },
-// );
+import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
 
 export const fetchProfile = createAsyncThunk(
   'user/fetchProfile',
@@ -35,7 +13,7 @@ export const fetchProfile = createAsyncThunk(
   },
 );
 
-export const authenticateUser = createAuthAsyncThunk(
+export const authenticateUser = createDataSubmitAsyncThunk(
   'user/auth',
   async (_, { rejectWithValue, dispatch }) => {
     const response = await userAPI.authMe();
@@ -52,7 +30,7 @@ export const authenticateUser = createAuthAsyncThunk(
   },
 );
 
-export const serviceLogin = createAuthAsyncThunk(
+export const serviceLogin = createDataSubmitAsyncThunk(
   'user/login',
   async (accountData: LoginParamsType, { dispatch, rejectWithValue }) => {
     const response = await userAPI.login(accountData);
@@ -69,7 +47,7 @@ export const serviceLogin = createAuthAsyncThunk(
   },
 );
 
-export const serviceLogout = createAuthAsyncThunk(
+export const serviceLogout = createDataSubmitAsyncThunk(
   'user/logout',
   async (_, { rejectWithValue }) => {
     const response = await userAPI.logout();

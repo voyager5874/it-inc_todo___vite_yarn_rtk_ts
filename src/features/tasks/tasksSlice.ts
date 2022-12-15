@@ -2,23 +2,59 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
+import type {
+  CreateTaskThunkArgType,
+  UpdateTaskThunkArgType,
+} from 'features/tasks/types';
+import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
 import type { TaskServerModelType } from 'services/api/types';
+import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
 
 const tasksAdapter = createEntityAdapter<TaskServerModelType>({
   // selectId: task => task.todoListId,
-  sortComparer: (a, b) => a.title.localeCompare(b.title),
+  sortComparer: (a, b) => a.order - b.order,
 });
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (id: string) => {
   const response = await tasksAPI.getTasks(id);
 
-  // if (id === '44537b83-cd7a-4aae-86bf-0d517a4e058d') {
-  //   debugger;
-  // }
-
   return { tasks: response.items, goalId: id };
 });
+
+export const addTask = createDataSubmitAsyncThunk(
+  'tasks/addTask',
+  async (apiCallData: CreateTaskThunkArgType, { rejectWithValue }) => {
+    const { goalId, data } = apiCallData;
+    const response = await tasksAPI.createTask(goalId, data);
+
+    if (response.resultCode === RequestResultCode.Error) {
+      return rejectWithValue({
+        messages: response.messages,
+        fieldsErrors: response.fieldsErrors,
+      });
+    }
+
+    return { goalId, taskData: response.data.item };
+  },
+);
+
+export const updateTask = createDataSubmitAsyncThunk(
+  'tasks/updateTask',
+  async (apiCallData: UpdateTaskThunkArgType, { rejectWithValue }) => {
+    const { goalId, taskId, data } = apiCallData;
+    const response = await tasksAPI.updateTask(goalId, taskId, data);
+
+    if (response.resultCode === RequestResultCode.Error) {
+      return rejectWithValue({
+        messages: response.messages,
+        fieldsErrors: response.fieldsErrors,
+      });
+    }
+
+    return { goalId, taskData: response.data.item };
+  },
+);
 
 const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
@@ -39,12 +75,30 @@ const tasksSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(fetchTasks.fulfilled, (state, action) => {
-      const { tasks } = action.payload;
+    builder
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        const { tasks } = action.payload;
 
-      tasksAdapter.upsertMany(state, tasks);
-      state.sortedByGoalId[action.payload.goalId] = tasks;
-    });
+        tasksAdapter.setMany(state, tasks);
+        state.sortedByGoalId[action.payload.goalId] = tasks;
+      })
+      .addCase(addTask.fulfilled, (state, action) => {
+        const { goalId, taskData } = action.payload;
+
+        tasksAdapter.addOne(state, taskData);
+        state.sortedByGoalId[goalId].push(taskData);
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const { goalId, taskData } = action.payload;
+        const taskId = taskData.id;
+
+        tasksAdapter.setOne(state, taskData);
+        let taskToUpdate = state.sortedByGoalId[goalId].find(task => task.id === taskId);
+
+        if (taskToUpdate) {
+          taskToUpdate = taskData;
+        }
+      });
   },
 });
 

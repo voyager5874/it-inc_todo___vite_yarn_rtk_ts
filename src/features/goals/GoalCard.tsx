@@ -5,8 +5,10 @@ import { List, ListItem, Paper, Typography } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { AddItem } from 'components/AddItem/AddItem';
 import type { GoalEntityAppType } from 'features/goals/types';
-import { fetchTasks, selectTasksByGoalId } from 'features/tasks/tasksSlice';
+import { addTask, fetchTasks, selectTasksByGoalId } from 'features/tasks/tasksSlice';
+import type { TaskEndpointPostPutModelDataType } from 'services/api/types';
 
 export const GoalCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => {
   const tasks = useAppSelector(state => selectTasksByGoalId(state, id));
@@ -14,7 +16,13 @@ export const GoalCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
 
   useEffect(() => {
     dispatch(fetchTasks(id));
-  }, [id]);
+  }, [id, dispatch]);
+
+  const handleAddTask = (taskTitle: string): void => {
+    const taskData: TaskEndpointPostPutModelDataType = { title: taskTitle };
+
+    dispatch(addTask({ goalId: id, data: taskData }));
+  };
 
   return (
     <Paper
@@ -30,6 +38,7 @@ export const GoalCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
           ))}
         </SimpleBar>
       </List>
+      <AddItem buttonName="add task" callback={handleAddTask} />
     </Paper>
   );
 };
