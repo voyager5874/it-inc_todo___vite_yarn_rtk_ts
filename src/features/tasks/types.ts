@@ -1,5 +1,5 @@
 import type {
-  TaskEndpointPostPutModelDataType,
+  TasksEndpointPostPutModelDataType,
   TaskServerModelType,
 } from 'services/api/types';
 
@@ -17,9 +17,9 @@ export type TaskEntityAppType = TaskServerModelType;
 // };
 
 type DataSubmitThunkArgType = {
-  goalId: string;
+  listId: string;
   taskId: string;
-  data: TaskEndpointPostPutModelDataType;
+  data: TasksEndpointPostPutModelDataType;
 };
 
 export type UpdateTaskThunkArgType = DataSubmitThunkArgType;

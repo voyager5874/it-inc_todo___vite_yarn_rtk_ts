@@ -18,9 +18,10 @@ import {
 import { Navigate, NavLink, Outlet } from 'react-router-dom';
 
 import { ColorModeContext } from 'app/App';
-import { useAppSelector } from 'app/hooks';
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { serviceLogout } from 'features/user/userSlice';
 
-const pages = ['user', 'goals'];
+const pages = ['user', 'lists'];
 
 export const DefaultLayout = (): ReactElement => {
   const auth = useAppSelector(state => state.user.auth);
@@ -28,6 +29,8 @@ export const DefaultLayout = (): ReactElement => {
   const appBusy = useAppSelector(state => state.app.status);
   const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const dispatch = useAppDispatch();
 
   // const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
   //   setAuth(event.target.checked);
@@ -44,6 +47,10 @@ export const DefaultLayout = (): ReactElement => {
   if (!auth) {
     return <Navigate to="/login" />;
   }
+
+  const handleLogout = (): void => {
+    dispatch(serviceLogout());
+  };
 
   return (
     <Box sx={{ border: '2px solid red', minHeight: '99vh' }}>
@@ -106,9 +113,12 @@ export const DefaultLayout = (): ReactElement => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem component={NavLink} to="/user">
+                  Profile
+                </MenuItem>
                 <MenuItem onClick={handleClose}>My account</MenuItem>
                 <MenuItem onClick={colorMode.toggleColorMode}>toggle theme</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>
           )}

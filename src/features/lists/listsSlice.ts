@@ -53,12 +53,12 @@ const initialState = listsAdapter.getInitialState({
 });
 
 const listsSlice = createSlice({
-  name: 'goals',
+  name: 'lists',
   initialState,
   reducers: {
-    goalAdded: listsAdapter.addOne,
-    goalsReceived(state, action: PayloadAction<{ goals: ListServerModelType[] }>) {
-      listsAdapter.setAll(state, action.payload.goals);
+    listAdded: listsAdapter.addOne,
+    listsReceived(state, action: PayloadAction<{ lists: ListServerModelType[] }>) {
+      listsAdapter.setAll(state, action.payload.lists);
     },
   },
   extraReducers: builder => {
@@ -78,7 +78,7 @@ const listsSlice = createSlice({
 export const listsReducer = listsSlice.reducer;
 
 export const {
-  selectAll: selectAllGoals,
-  selectById: selectGoalById,
-  selectIds: selectGoalsIds,
+  selectAll: selectAllLists,
+  selectById: selectListById,
+  selectIds: selectListsIds,
 } = listsAdapter.getSelectors<RootStateType>(state => state.lists);

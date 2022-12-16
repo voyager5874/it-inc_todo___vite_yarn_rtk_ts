@@ -1,7 +1,7 @@
 import { baseAxiosInstance } from 'services/api/axiosConfig';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import type {
-  TaskEndpointPostPutModelDataType,
+  TasksEndpointPostPutModelDataType,
   TaskEndpointPostPutResponseType,
   TasksEndpointGetResponseType,
 } from 'services/api/types';
@@ -9,28 +9,32 @@ import { clearObjectEmptyData } from 'utils/clearObjectEmptyData';
 
 export const tasksAPI = {
   getTasks(
-    goalId: string,
+    listId: string,
     count: string | number = SERVER_MAX_TASKS_PER_REQUEST,
     page: number | string = 1,
   ) {
     return baseAxiosInstance
       .get<TasksEndpointGetResponseType>(
-        `todo-lists/${goalId}/tasks?count=${count}&page=${page}`,
+        `todo-lists/${listId}/tasks?count=${count}&page=${page}`,
       )
       .then(res => res.data);
   },
-  createTask(goalId: string, taskData: TaskEndpointPostPutModelDataType) {
+  createTask(listId: string, taskData: TasksEndpointPostPutModelDataType) {
     const data = clearObjectEmptyData(taskData);
 
     return baseAxiosInstance
-      .post<TaskEndpointPostPutResponseType>(`todo-lists/${goalId}/tasks`, data)
+      .post<TaskEndpointPostPutResponseType>(`todo-lists/${listId}/tasks`, data)
       .then(res => res.data);
   },
-  updateTask(goalId: string, taskId: string, taskData: TaskEndpointPostPutModelDataType) {
+  updateTask(
+    listId: string,
+    taskId: string,
+    taskData: TasksEndpointPostPutModelDataType,
+  ) {
     const data = clearObjectEmptyData(taskData);
 
     return baseAxiosInstance
-      .put<TaskEndpointPostPutResponseType>(`todo-lists/${goalId}/tasks/${taskId}`, data)
+      .put<TaskEndpointPostPutResponseType>(`todo-lists/${listId}/tasks/${taskId}`, data)
       .then(res => res.data);
   },
 };

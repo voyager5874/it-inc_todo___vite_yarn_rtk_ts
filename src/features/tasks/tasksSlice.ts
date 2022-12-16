@@ -20,14 +20,14 @@ const tasksAdapter = createEntityAdapter<TaskServerModelType>({
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (id: string) => {
   const response = await tasksAPI.getTasks(id);
 
-  return { tasks: response.items, goalId: id };
+  return { tasks: response.items, listId: id };
 });
 
 export const addTask = createDataSubmitAsyncThunk(
   'tasks/addTask',
   async (apiCallData: CreateTaskThunkArgType, { rejectWithValue }) => {
-    const { goalId, data } = apiCallData;
-    const response = await tasksAPI.createTask(goalId, data);
+    const { listId, data } = apiCallData;
+    const response = await tasksAPI.createTask(listId, data);
 
     if (response.resultCode === RequestResultCode.Error) {
       return rejectWithValue({
@@ -36,15 +36,15 @@ export const addTask = createDataSubmitAsyncThunk(
       });
     }
 
-    return { goalId, taskData: response.data.item };
+    return { listId, taskData: response.data.item };
   },
 );
 
 export const updateTask = createDataSubmitAsyncThunk(
   'tasks/updateTask',
   async (apiCallData: UpdateTaskThunkArgType, { rejectWithValue }) => {
-    const { goalId, taskId, data } = apiCallData;
-    const response = await tasksAPI.updateTask(goalId, taskId, data);
+    const { listId, taskId, data } = apiCallData;
+    const response = await tasksAPI.updateTask(listId, taskId, data);
 
     if (response.resultCode === RequestResultCode.Error) {
       return rejectWithValue({
@@ -53,14 +53,14 @@ export const updateTask = createDataSubmitAsyncThunk(
       });
     }
 
-    return { goalId, taskData: response.data.item };
+    return { listId, taskData: response.data.item };
   },
 );
 
 const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: 'idle' as EntityLoadingStatusType,
-  sortedByGoalId: {} as Record<string, TaskServerModelType[]>,
+  sortedByListId: {} as Record<string, TaskServerModelType[]>,
 });
 
 const tasksSlice = createSlice({
@@ -72,7 +72,7 @@ const tasksSlice = createSlice({
       const { tasks } = action.payload;
 
       tasksAdapter.upsertMany(state, tasks);
-      state.sortedByGoalId[tasks[0].todoListId] = tasks;
+      state.sortedByListId[tasks[0].todoListId] = tasks;
     },
   },
   extraReducers: builder => {
@@ -81,35 +81,37 @@ const tasksSlice = createSlice({
         const { tasks } = action.payload;
 
         tasksAdapter.setMany(state, tasks);
-        state.sortedByGoalId[action.payload.goalId] = tasks;
+        state.sortedByListId[action.payload.listId] = tasks;
       })
       .addCase(addTask.fulfilled, (state, action) => {
-        const { goalId, taskData } = action.payload;
+        const { listId, taskData } = action.payload;
 
         tasksAdapter.addOne(state, taskData);
-        state.sortedByGoalId[goalId].push(taskData);
+        state.sortedByListId[listId].push(taskData);
       })
       .addCase(updateTask.fulfilled, (state, action) => {
-        const { goalId, taskData } = action.payload;
+        const { listId, taskData } = action.payload;
         const taskId = taskData.id;
 
-        tasksAdapter.setOne(state, taskData);
-        let taskToUpdate = state.sortedByGoalId[goalId].find(task => task.id === taskId);
+        tasksAdapter.updateOne(state, { id: taskId, changes: taskData });
+        const taskToUpdate = state.sortedByListId[listId].find(
+          task => task.id === taskId,
+        );
 
         if (taskToUpdate) {
-          taskToUpdate = taskData;
+          Object.assign(taskToUpdate, taskData);
         }
       })
       .addCase(addList.fulfilled, (state, action) => {
         const { id } = action.payload;
 
-        state.sortedByGoalId[id] = [];
+        state.sortedByListId[id] = [];
       })
       .addCase(deleteList.fulfilled, (state, action) => {
-        const tasksIds = state.sortedByGoalId[action.payload.listId].map(task => task.id);
+        const tasksIds = state.sortedByListId[action.payload.listId].map(task => task.id);
 
         tasksAdapter.removeMany(state, tasksIds);
-        delete state.sortedByGoalId[action.payload.listId];
+        delete state.sortedByListId[action.payload.listId];
       });
   },
 });
@@ -127,7 +129,7 @@ export const {
 //   (tasks, goalId) => tasks.filter(task => task.todoListId === goalId),
 // );
 
-export const selectTasksByGoalId = (
+export const selectTasksByListId = (
   state: RootStateType,
-  goalId: string,
-): TaskServerModelType[] => state.tasks.sortedByGoalId[goalId];
+  listId: string,
+): TaskServerModelType[] => state.tasks.sortedByListId[listId];

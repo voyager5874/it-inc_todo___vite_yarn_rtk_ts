@@ -6,10 +6,10 @@ import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
-import { addList, fetchLists, ListCard, selectAllGoals } from 'features/lists';
+import { addList, fetchLists, ListCard, selectAllLists } from 'features/lists';
 
 export const ListsPage = (): ReactElement => {
-  const goals = useAppSelector(selectAllGoals);
+  const goals = useAppSelector(selectAllLists);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

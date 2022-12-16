@@ -63,7 +63,7 @@ export type TasksEndpointGetResponseType = {
   error: string | null;
 };
 
-export type TaskEndpointPostPutModelDataType = {
+export type TasksEndpointPostPutModelDataType = {
   title: string;
   description?: string;
   status?: TaskStatus;

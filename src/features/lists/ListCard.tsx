@@ -17,14 +17,17 @@ import SimpleBar from 'simplebar-react';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
 import { deleteList } from 'features/lists/listsSlice';
-import type { GoalEntityAppType } from 'features/lists/types';
-import { addTask, fetchTasks, selectTasksByGoalId } from 'features/tasks/tasksSlice';
-import type { TaskEndpointPostPutModelDataType } from 'services/api/types';
+import type { ListEntityAppType } from 'features/lists/types';
+import { addTask, fetchTasks, selectTasksByListId } from 'features/tasks/tasksSlice';
+import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
+import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 
-export const ListCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => {
-  const tasks = useAppSelector(state => selectTasksByGoalId(state, id));
+export const ListCard: FC<ListEntityAppType> = ({ title, id }): ReactElement => {
+  const tasks = useAppSelector(state => selectTasksByListId(state, id));
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const dispatch = useAppDispatch();
 
@@ -33,9 +36,9 @@ export const ListCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
   }, [id, dispatch]);
 
   const handleAddTask = (taskTitle: string): void => {
-    const taskData: TaskEndpointPostPutModelDataType = { title: taskTitle };
+    const taskData: TasksEndpointPostPutModelDataType = { title: taskTitle };
 
-    dispatch(addTask({ goalId: id, data: taskData }));
+    dispatch(addTask({ listId: id, data: taskData }));
   };
 
   const handleMenu = (event: MouseEvent<HTMLElement>): void => {
@@ -52,9 +55,15 @@ export const ListCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
     handleCloseListMenu();
   };
 
+  const handleOpenListDialog = (taskId: string): void => {
+    setSelectedTaskId(taskId);
+    setListDialogOpen(true);
+  };
+
   return (
     <Paper
       sx={{ minWidth: '300px', padding: '20px', maxHeight: '85vh', maxWidth: '400px' }}
+      elevation={2}
     >
       <Stack
         direction="row"
@@ -74,12 +83,12 @@ export const ListCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
           id="menu-appbar"
           anchorEl={anchorEl}
           anchorOrigin={{
-            vertical: 'bottom',
+            vertical: 'top',
             horizontal: 'right',
           }}
           transformOrigin={{
             vertical: 'top',
-            horizontal: 'right',
+            horizontal: 'left',
           }}
           open={Boolean(anchorEl)}
           onClose={handleCloseListMenu}
@@ -92,11 +101,27 @@ export const ListCard: FC<GoalEntityAppType> = ({ title, id }): ReactElement => 
       <List sx={{ overflowY: 'auto', backgroundColor: 'red' }}>
         <SimpleBar autoHide={false} style={{ maxHeight: '72vh' }}>
           {(tasks || []).map(task => (
-            <ListItem key={task.id}>{task.title}</ListItem>
+            <ListItem
+              onClick={() => handleOpenListDialog(task.id)}
+              key={task.id}
+              sx={{
+                backgroundColor: 'rgba(25,166,20,0.6)',
+                border: '1px solid',
+                cursor: 'pointer',
+              }}
+            >
+              {task.title}
+            </ListItem>
           ))}
         </SimpleBar>
       </List>
       <AddItem buttonName="add task" callback={handleAddTask} />
+      <TaskDialog
+        open={Boolean(selectedTaskId) && listDialogOpen}
+        setOpen={setListDialogOpen}
+        listId={id}
+        taskId={selectedTaskId!}
+      />
     </Paper>
   );
 };

@@ -51,14 +51,6 @@ const appSlice = createSlice({
       .addCase(authenticateUser.fulfilled, state => {
         state.isInitialized = true;
       })
-      // .addCase(authenticateUser.rejected, (state, action) => {
-      //   state.isInitialized = true;
-      //   if (action.payload?.messages.length) {
-      //     state.error = action.payload.messages.join(', ');
-      //   } else {
-      //     state.error = String(action.error);
-      //   }
-      // })
       .addMatcher(
         isAnyOf(
           serviceLogin.rejected,
@@ -78,7 +70,6 @@ const appSlice = createSlice({
           } else {
             state.error = JSON.stringify(action.error);
           }
-          state.status = 'idle';
         },
       )
       .addMatcher<FulfilledAction>(
@@ -96,7 +87,7 @@ const appSlice = createSlice({
       .addMatcher<RejectedAction>(
         action => action.type.endsWith('/rejected'),
         state => {
-          state.status = 'busy';
+          state.status = 'idle';
         },
       );
   },
