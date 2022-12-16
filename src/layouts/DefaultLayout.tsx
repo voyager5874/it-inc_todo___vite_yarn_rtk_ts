@@ -8,6 +8,7 @@ import {
   Avatar,
   Box,
   IconButton,
+  LinearProgress,
   Link,
   Menu,
   MenuItem,
@@ -24,6 +25,7 @@ const pages = ['user', 'goals'];
 export const DefaultLayout = (): ReactElement => {
   const auth = useAppSelector(state => state.user.auth);
   const avatar = useAppSelector(state => state.user.photoLarge);
+  const appBusy = useAppSelector(state => state.app.status);
   const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -111,6 +113,7 @@ export const DefaultLayout = (): ReactElement => {
             </div>
           )}
         </Toolbar>
+        {appBusy === 'busy' && <LinearProgress />}
       </AppBar>
       <Outlet />
     </Box>

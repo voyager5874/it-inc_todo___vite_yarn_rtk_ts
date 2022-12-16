@@ -1,7 +1,12 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 
-import type { RootStateType } from 'app/types';
+import type {
+  FulfilledAction,
+  PendingAction,
+  RejectedAction,
+  RootStateType,
+} from 'app/types';
 import { addList, deleteList } from 'features/lists';
 import { addTask } from 'features/tasks/tasksSlice';
 import { authenticateUser, serviceLogin, serviceLogout } from 'features/user/userSlice';
@@ -73,6 +78,25 @@ const appSlice = createSlice({
           } else {
             state.error = JSON.stringify(action.error);
           }
+          state.status = 'idle';
+        },
+      )
+      .addMatcher<FulfilledAction>(
+        action => action.type.endsWith('/fulfilled'),
+        state => {
+          state.status = 'idle';
+        },
+      )
+      .addMatcher<PendingAction>(
+        action => action.type.endsWith('/pending'),
+        state => {
+          state.status = 'busy';
+        },
+      )
+      .addMatcher<RejectedAction>(
+        action => action.type.endsWith('/rejected'),
+        state => {
+          state.status = 'busy';
         },
       );
   },
