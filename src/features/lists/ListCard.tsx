@@ -105,7 +105,6 @@ export const ListCard: FC<ListEntityAppType> = ({ title, id }): ReactElement => 
               onClick={() => handleOpenListDialog(task.id)}
               key={task.id}
               sx={{
-                backgroundColor: 'rgba(25,166,20,0.6)',
                 border: '1px solid',
                 cursor: 'pointer',
               }}

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import type { AlertColor } from '@mui/material';
 import { Alert, Box, Snackbar } from '@mui/material';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { resetAppEvents } from 'app/appSlice';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
@@ -13,11 +13,14 @@ export const RootLayout = (): ReactElement => {
   const success = useAppSelector(state => state.app.success);
   const info = useAppSelector(state => state.app.info);
 
+  const auth = useAppSelector(state => state.user.auth);
+
   const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor | undefined>(
     undefined,
   );
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const showSnackbar = error || success || info;
 
@@ -26,6 +29,11 @@ export const RootLayout = (): ReactElement => {
     if (success) setSnackbarSeverity('success');
     if (info) setSnackbarSeverity('info');
   }, [error, success, info]);
+
+  useEffect(() => {
+    if (auth) navigate('/lists');
+    if (!auth) navigate('/login');
+  }, [auth, navigate]);
 
   const handleSnackbarClose = (): void => {
     dispatch(resetAppEvents());

@@ -51,12 +51,15 @@ const appSlice = createSlice({
       .addCase(authenticateUser.fulfilled, state => {
         state.isInitialized = true;
       })
+      .addCase(authenticateUser.rejected, state => {
+        state.isInitialized = true;
+      })
       .addMatcher(
         isAnyOf(
           serviceLogin.rejected,
           serviceLogout.rejected,
           deleteList.rejected,
-          authenticateUser.rejected,
+          // authenticateUser.rejected,
           addList.rejected,
           addTask.rejected,
         ),
