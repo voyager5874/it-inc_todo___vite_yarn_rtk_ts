@@ -13,7 +13,7 @@ export const LoginPage = (): ReactElement => {
 
   useEffect(() => {
     if (!auth) return;
-    navigate('../goals', { replace: true });
+    navigate('../lists', { replace: true });
   }, [auth, navigate]);
 
   return (

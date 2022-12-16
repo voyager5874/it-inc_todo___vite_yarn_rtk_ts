@@ -18,7 +18,7 @@ import { authenticateUser } from 'features/user/userSlice';
 import { RootLayout } from 'layouts';
 import { DefaultLayout } from 'layouts/DefaultLayout';
 import { NotFound } from 'pages';
-import { GoalsPage } from 'pages/goalsList/GoalsPage';
+import { ListsPage } from 'pages/lists/ListsPage';
 import { LoginPage } from 'pages/login/LoginPage';
 import { UserPage } from 'pages/user/UserPage';
 
@@ -34,13 +34,13 @@ const router = createBrowserRouter([
         errorElement: <NotFound />,
       },
       {
-        path: '/goals',
+        path: '/lists',
         element: <DefaultLayout />,
         errorElement: <NotFound />,
         children: [
           {
             index: true,
-            element: <GoalsPage />,
+            element: <ListsPage />,
           },
         ],
       },
@@ -63,7 +63,9 @@ export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
 export const App = (): ReactElement => {
   const appIsInitialized = useAppSelector(state => selectAppInitializationStatus(state));
+
   const dispatch = useAppDispatch();
+
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [colorMode, setColorMode] = useState<PaletteMode>(
     prefersDarkMode ? 'dark' : 'light',

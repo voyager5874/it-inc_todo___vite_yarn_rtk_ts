@@ -76,18 +76,20 @@ export type TaskEndpointPostPutResponseType = FormSubmitResponseType<{
   item: TaskServerModelType;
 }>;
 
-export type GoalServerModelType = {
+export type ListServerModelType = {
   id: string;
   title: string;
   addedDate: string;
   order: number;
 };
 
-export type TodoListsEndpointGetResponseType = GoalServerModelType[];
+export type TodoListsEndpointGetResponseType = ListServerModelType[];
 
 export type TodoListsEndpointPostResponseType = FormSubmitResponseType<{
-  item: GoalServerModelType;
+  item: ListServerModelType;
 }>;
+
+export type TodoListsEndpointDeleteResponseType = FormSubmitResponseType;
 
 export type PutAvatarResponseType = {
   photos: {

@@ -2,7 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
-import { addGoal } from 'features/goals';
+import { addList, deleteList } from 'features/lists';
 import type {
   CreateTaskThunkArgType,
   UpdateTaskThunkArgType,
@@ -100,10 +100,16 @@ const tasksSlice = createSlice({
           taskToUpdate = taskData;
         }
       })
-      .addCase(addGoal.fulfilled, (state, action) => {
+      .addCase(addList.fulfilled, (state, action) => {
         const { id } = action.payload;
 
         state.sortedByGoalId[id] = [];
+      })
+      .addCase(deleteList.fulfilled, (state, action) => {
+        const tasksIds = state.sortedByGoalId[action.payload.listId].map(task => task.id);
+
+        tasksAdapter.removeMany(state, tasksIds);
+        delete state.sortedByGoalId[action.payload.listId];
       });
   },
 });
