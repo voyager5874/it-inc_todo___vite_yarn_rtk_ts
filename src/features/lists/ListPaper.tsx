@@ -1,11 +1,11 @@
-import type { FC, ReactElement, MouseEvent } from 'react';
+import type { FC, MouseEvent, ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
+  Card,
   IconButton,
   List,
-  ListItem,
   Menu,
   MenuItem,
   Paper,
@@ -22,7 +22,7 @@ import { addTask, fetchTasks, selectTasksByListId } from 'features/tasks/tasksSl
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 
-export const ListCard: FC<ListEntityAppType> = ({ title, id }): ReactElement => {
+export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement => {
   const tasks = useAppSelector(state => selectTasksByListId(state, id));
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -62,16 +62,28 @@ export const ListCard: FC<ListEntityAppType> = ({ title, id }): ReactElement => 
 
   return (
     <Paper
-      sx={{ minWidth: '300px', padding: '20px', maxHeight: '85vh', maxWidth: '400px' }}
+      sx={[
+        {
+          minWidth: '300px',
+          padding: '10px 5px 10px 10px',
+          maxHeight: '85vh',
+          maxWidth: '400px',
+        },
+        theme => ({
+          backgroundColor: theme.palette.mode === 'light' ? 'grey.300' : 'grey.900',
+        }),
+      ]}
       elevation={2}
     >
       <Stack
         direction="row"
+        gap={2}
         justifyContent="space-between"
-        sx={{ backgroundColor: 'background.default', padding: '10px' }}
+        sx={{ padding: '10px 20px 10px 10px' }}
       >
         <Typography variant="h5">{title}</Typography>
         <IconButton
+          sx={{ borderRadius: '0.2em' }}
           aria-label="list menu"
           aria-controls="menu-appbar"
           aria-haspopup="true"
@@ -80,7 +92,7 @@ export const ListCard: FC<ListEntityAppType> = ({ title, id }): ReactElement => 
           <MoreHorizIcon />
         </IconButton>
         <Menu
-          id="menu-appbar"
+          id="menu-list"
           anchorEl={anchorEl}
           anchorOrigin={{
             vertical: 'top',
@@ -98,19 +110,29 @@ export const ListCard: FC<ListEntityAppType> = ({ title, id }): ReactElement => 
         </Menu>
       </Stack>
 
-      <List sx={{ overflowY: 'auto', backgroundColor: 'red' }}>
-        <SimpleBar autoHide={false} style={{ maxHeight: '72vh' }}>
+      <List sx={{ overflowY: 'auto' }}>
+        <SimpleBar autoHide={false} style={{ maxHeight: '72vh', paddingRight: '20px' }}>
           {(tasks || []).map(task => (
-            <ListItem
+            <Card
               onClick={() => handleOpenListDialog(task.id)}
               key={task.id}
-              sx={{
-                border: '1px solid',
-                cursor: 'pointer',
-              }}
+              sx={[
+                {
+                  cursor: 'pointer',
+                  marginBottom: '8px',
+                  // marginRight: '20px',
+                  padding: '10px',
+                },
+                theme => ({
+                  '&:hover': {
+                    backgroundColor:
+                      theme.palette.mode === 'dark' ? 'grey.700' : 'grey.200',
+                  },
+                }),
+              ]}
             >
               {task.title}
-            </ListItem>
+            </Card>
           ))}
         </SimpleBar>
       </List>

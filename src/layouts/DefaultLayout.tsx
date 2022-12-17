@@ -15,7 +15,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { Navigate, NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 
 import { ColorModeContext } from 'app/App';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
@@ -24,7 +24,6 @@ import { serviceLogout } from 'features/user/userSlice';
 const pages = ['user', 'lists'];
 
 export const DefaultLayout = (): ReactElement => {
-  const auth = useAppSelector(state => state.user.auth);
   const avatar = useAppSelector(state => state.user.photoLarge);
   const appBusy = useAppSelector(state => state.app.status);
   const colorMode = useContext(ColorModeContext);
@@ -44,12 +43,13 @@ export const DefaultLayout = (): ReactElement => {
     setAnchorEl(null);
   };
 
-  if (!auth) {
-    return <Navigate to="/login" />;
-  }
-
   const handleLogout = (): void => {
     dispatch(serviceLogout());
+  };
+
+  const handleToggleTheme = (): void => {
+    colorMode.toggleColorMode();
+    handleClose();
   };
 
   return (
@@ -84,44 +84,41 @@ export const DefaultLayout = (): ReactElement => {
               </Link>
             ))}
           </Box>
-          {auth && (
-            <div>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <Avatar src={avatar} alt="avatar">
-                  <AccountCircle />
-                </Avatar>
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem component={NavLink} to="/user">
-                  Profile
-                </MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
-                <MenuItem onClick={colorMode.toggleColorMode}>toggle theme</MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </Menu>
-            </div>
-          )}
+          <div>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <Avatar src={avatar} alt="avatar">
+                <AccountCircle />
+              </Avatar>
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem component={NavLink} to="/user">
+                Profile
+              </MenuItem>
+              <MenuItem onClick={handleClose}>My account</MenuItem>
+              <MenuItem onClick={handleToggleTheme}>toggle theme</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </div>
         </Toolbar>
         {appBusy === 'busy' && <LinearProgress />}
       </AppBar>

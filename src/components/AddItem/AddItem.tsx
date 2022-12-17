@@ -1,7 +1,8 @@
 import type { ChangeEvent, FC } from 'react';
 import { useState } from 'react';
 
-import { Box, Button, TextareaAutosize } from '@mui/material';
+import { Add, Style } from '@mui/icons-material';
+import { Box, Button, IconButton, TextareaAutosize } from '@mui/material';
 
 export type AddItemPropsType = {
   buttonName: string;
@@ -35,11 +36,21 @@ export const AddItem: FC<AddItemPropsType> = ({ buttonName, callback }) => {
   };
 
   return !active ? (
-    <Button onClick={activateForm} sx={{ minWidth: '300px' }} variant="contained">
-      {buttonName}
-    </Button>
+    <Box sx={{ marginRight: '20px', minWidth: '250px', display: 'flex', gap: '7px' }}>
+      <Button
+        onClick={activateForm}
+        sx={{ padding: '7px 20px 7px 20px', justifyContent: 'flex-start', flexGrow: 1 }}
+        variant="text"
+        startIcon={<Add />}
+      >
+        {buttonName}
+      </Button>
+      <IconButton sx={{ borderRadius: '0.2em' }}>
+        <Style />
+      </IconButton>
+    </Box>
   ) : (
-    <Box sx={{ maxWidth: '400px', minWidth: '300px' }}>
+    <Box sx={{ maxWidth: '400px', minWidth: '250px', marginRight: '20px' }}>
       <TextareaAutosize
         value={itemTitle}
         onChange={saveText}
@@ -48,6 +59,7 @@ export const AddItem: FC<AddItemPropsType> = ({ buttonName, callback }) => {
           minHeight: '50px',
           resize: 'vertical',
           maxHeight: '200px',
+          outline: 'none',
         }}
       />
       <Box>

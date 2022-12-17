@@ -10,7 +10,7 @@ import {
   ThemeProvider,
   useMediaQuery,
 } from '@mui/material';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import { selectAppInitializationStatus } from 'app/appSlice';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
@@ -28,6 +28,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     errorElement: <NotFound />,
     children: [
+      { index: true, element: <Navigate to="/lists" /> },
       {
         path: '/login',
         element: <LoginPage />,

@@ -6,7 +6,7 @@ import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
-import { addList, fetchLists, ListCard, selectAllLists } from 'features/lists';
+import { addList, fetchLists, ListPaper, selectAllLists } from 'features/lists';
 
 export const ListsPage = (): ReactElement => {
   const goals = useAppSelector(selectAllLists);
@@ -38,11 +38,11 @@ export const ListsPage = (): ReactElement => {
         sx={{
           width: 'fit-content',
           minHeight: '90vh',
-          border: '2px solid teal',
+          // border: '2px solid teal',
         }}
       >
         {goals.map(goal => (
-          <ListCard {...goal} key={goal.id} />
+          <ListPaper {...goal} key={goal.id} />
         ))}
         <AddItem buttonName="Add column" callback={handleAddColumn} />
       </Stack>

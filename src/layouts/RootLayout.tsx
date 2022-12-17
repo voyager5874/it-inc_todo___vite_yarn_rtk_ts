@@ -30,8 +30,9 @@ export const RootLayout = (): ReactElement => {
     if (info) setSnackbarSeverity('info');
   }, [error, success, info]);
 
+  // probably the app router needs optimization
   useEffect(() => {
-    if (auth) navigate('/lists');
+    // if (auth) navigate('/lists');
     if (!auth) navigate('/login');
   }, [auth, navigate]);
 
