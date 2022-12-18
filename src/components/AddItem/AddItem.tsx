@@ -1,14 +1,21 @@
 import type { ChangeEvent, FC } from 'react';
 import { useState } from 'react';
 
-import { Add, Style } from '@mui/icons-material';
-import { Box, Button, IconButton, TextareaAutosize } from '@mui/material';
+import { Add, Close, MoreHoriz, Style } from '@mui/icons-material';
+import { Box, Button, IconButton, Paper, TextField } from '@mui/material';
 
 export type AddItemPropsType = {
   buttonName: string;
   callback: (title: string) => void;
+  extraControls?: boolean;
+  backplate?: boolean;
 };
-export const AddItem: FC<AddItemPropsType> = ({ buttonName, callback }) => {
+export const AddItem: FC<AddItemPropsType> = ({
+  buttonName,
+  callback,
+  extraControls = false,
+  backplate = false,
+}) => {
   const [active, setActive] = useState(false);
   const [itemTitle, setItemTitle] = useState('');
 
@@ -18,6 +25,7 @@ export const AddItem: FC<AddItemPropsType> = ({ buttonName, callback }) => {
 
   const deactivateForm = (): void => {
     setActive(false);
+    setItemTitle('');
   };
 
   const handleSubmit = (): void => {
@@ -30,8 +38,6 @@ export const AddItem: FC<AddItemPropsType> = ({ buttonName, callback }) => {
   };
 
   const saveText = (event: ChangeEvent<HTMLTextAreaElement>): void => {
-    console.log(event.target.value);
-    // console.log(event.currentTarget.value);
     setItemTitle(event.target.value);
   };
 
@@ -45,27 +51,85 @@ export const AddItem: FC<AddItemPropsType> = ({ buttonName, callback }) => {
       >
         {buttonName}
       </Button>
-      <IconButton sx={{ borderRadius: '0.2em' }}>
-        <Style />
-      </IconButton>
+      {extraControls && (
+        <IconButton sx={{ borderRadius: '0.2em' }}>
+          <Style />
+        </IconButton>
+      )}
     </Box>
   ) : (
-    <Box sx={{ maxWidth: '400px', minWidth: '250px', marginRight: '20px' }}>
-      <TextareaAutosize
+    <Paper
+      sx={[
+        {
+          maxWidth: '400px',
+          minWidth: '280px',
+          marginRight: '20px',
+          padding: backplate ? '10px' : '0px',
+          boxShadow: 'none',
+        },
+        theme => ({
+          backgroundColor: () => {
+            if (theme.palette.mode === 'dark') {
+              return theme.palette.grey[900];
+            }
+
+            return theme.palette.grey[300];
+          },
+        }),
+      ]}
+    >
+      <TextField
+        multiline
+        maxRows={7}
+        variant="outlined"
         value={itemTitle}
         onChange={saveText}
-        style={{
-          width: '100%',
-          minHeight: '50px',
-          resize: 'vertical',
-          maxHeight: '200px',
-          outline: 'none',
-        }}
+        fullWidth
+        sx={[
+          {
+            marginBottom: '10px',
+            // width: '100%',
+            // minHeight: '50px',
+            // resize: 'vertical',
+            // maxHeight: '200px',
+            // outline: 'none',
+            // border: 'none',
+            borderRadius: '4px',
+            '& fieldset': { border: 'none' },
+          },
+          theme => ({
+            boxShadow: theme.shadows[2],
+            backgroundColor:
+              theme.palette.mode === 'light'
+                ? theme.palette.background.paper
+                : theme.palette.grey[900],
+          }),
+        ]}
       />
-      <Box>
-        <Button onClick={handleSubmit}>{buttonName}</Button>
-        <Button onClick={deactivateForm}>X</Button>
+      <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
+          <Button onClick={handleSubmit} variant="contained">
+            {buttonName}
+          </Button>
+          <IconButton
+            onClick={deactivateForm}
+            sx={{
+              borderRadius: '4px',
+            }}
+          >
+            <Close />
+          </IconButton>
+        </Box>
+        {extraControls && (
+          <IconButton
+            sx={{
+              borderRadius: '4px',
+            }}
+          >
+            <MoreHoriz />
+          </IconButton>
+        )}
       </Box>
-    </Box>
+    </Paper>
   );
 };

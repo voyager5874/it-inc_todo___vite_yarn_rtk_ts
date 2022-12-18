@@ -91,6 +91,12 @@ export type TodoListsEndpointPostResponseType = FormSubmitResponseType<{
 
 export type TodoListsEndpointDeleteResponseType = FormSubmitResponseType;
 
+export type TodoListPutModelDataType = {
+  title: string;
+};
+
+export type TodoListEndpointPutResponseType = FormSubmitResponseType;
+
 export type PutAvatarResponseType = {
   photos: {
     small: string;

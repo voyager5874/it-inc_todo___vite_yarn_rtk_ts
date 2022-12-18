@@ -1,5 +1,10 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit';
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
 import { addList, deleteList } from 'features/lists';
@@ -133,3 +138,38 @@ export const selectTasksByListId = (
   state: RootStateType,
   listId: string,
 ): TaskServerModelType[] => state.tasks.sortedByListId[listId];
+
+export const selectTaskTitle = createSelector(selectTaskBylId, task => {
+  console.log('taskTitleSelector', task);
+  if (task) {
+    console.log('taskTitleSelector', task.title);
+
+    return task.title;
+  }
+
+  return 'selectTaskTitle: task access error';
+});
+
+export const selectTaskDescription = createSelector(selectTaskBylId, task =>
+  task ? task.description : 'selectTaskDescription: task access error',
+);
+
+export const selectTaskDeadline = createSelector(selectTaskBylId, task =>
+  task ? task.deadline : 'selectTaskDeadline: task access error',
+);
+
+export const selectTaskStartDate = createSelector(selectTaskBylId, task =>
+  task ? task.startDate : 'selectTaskStartDate: task access error',
+);
+
+export const selectTaskPriority = createSelector(selectTaskBylId, task =>
+  task ? task.priority : 'selectTaskPriority: task access error',
+);
+
+export const selectTaskStatus = createSelector(selectTaskBylId, task =>
+  task ? task.status : 'selectTaskStatus: task access error',
+);
+
+export const selectTaskParentId = createSelector(selectTaskBylId, task =>
+  task ? task.todoListId : 'selectTaskParentId: task access error',
+);

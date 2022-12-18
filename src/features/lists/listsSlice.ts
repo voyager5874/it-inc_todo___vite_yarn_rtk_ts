@@ -1,7 +1,13 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit';
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
+import type { UpdateListThunkArgType } from 'features/lists/types';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
 import type { ListServerModelType } from 'services/api/types';
@@ -47,6 +53,24 @@ export const deleteList = createDataSubmitAsyncThunk(
   },
 );
 
+export const updateList = createDataSubmitAsyncThunk(
+  'lists/updateList',
+  async (apiCallData: UpdateListThunkArgType, { rejectWithValue }) => {
+    const { listId, data } = apiCallData;
+    const response = await listsAPI.updateList(listId, data);
+
+    if (response.resultCode === RequestResultCode.Error) {
+      return rejectWithValue({
+        messages: response.messages,
+        fieldsErrors: response.fieldsErrors,
+      });
+    }
+
+    // server returns no data on success
+    return apiCallData;
+  },
+);
+
 const initialState = listsAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: 'idle' as EntityLoadingStatusType,
@@ -71,6 +95,11 @@ const listsSlice = createSlice({
       })
       .addCase(deleteList.fulfilled, (state, action) => {
         listsAdapter.removeOne(state, action.payload.listId);
+      })
+      .addCase(updateList.fulfilled, (state, action) => {
+        const { listId, data } = action.payload;
+
+        listsAdapter.updateOne(state, { id: listId, changes: data });
       });
   },
 });
@@ -82,3 +111,7 @@ export const {
   selectById: selectListById,
   selectIds: selectListsIds,
 } = listsAdapter.getSelectors<RootStateType>(state => state.lists);
+
+export const selectListTitle = createSelector(selectListById, list =>
+  list ? list.title : 'list access error',
+);

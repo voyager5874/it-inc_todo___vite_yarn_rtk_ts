@@ -44,7 +44,7 @@ export const ListsPage = (): ReactElement => {
         {goals.map(goal => (
           <ListPaper {...goal} key={goal.id} />
         ))}
-        <AddItem buttonName="Add column" callback={handleAddColumn} />
+        <AddItem buttonName="Add column" callback={handleAddColumn} backplate />
       </Stack>
     </SimpleBar>
   );

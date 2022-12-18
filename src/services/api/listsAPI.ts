@@ -1,6 +1,8 @@
 import { baseAxiosInstance } from './axiosConfig';
 
 import type {
+  TodoListEndpointPutResponseType,
+  TodoListPutModelDataType,
   TodoListsEndpointDeleteResponseType,
   TodoListsEndpointGetResponseType,
   TodoListsEndpointPostResponseType,
@@ -22,9 +24,9 @@ export const listsAPI = {
       .delete<TodoListsEndpointDeleteResponseType>(`todo-lists/${id}`)
       .then(res => res.data);
   },
-  // updateGoal(id: string, title: string) {
-  //   const promise = instance.put<ResponseType>(`todo-lists/${id}`, { title });
-  //
-  //   return promise;
-  // },
+  updateList(id: string, data: TodoListPutModelDataType) {
+    return baseAxiosInstance
+      .put<TodoListEndpointPutResponseType>(`todo-lists/${id}`, data)
+      .then(res => res.data);
+  },
 };
