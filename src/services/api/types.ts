@@ -93,6 +93,7 @@ export type TodoListsEndpointDeleteResponseType = FormSubmitResponseType;
 
 export type TodoListPutModelDataType = {
   title: string;
+  order?: number;
 };
 
 export type TodoListEndpointPutResponseType = FormSubmitResponseType;

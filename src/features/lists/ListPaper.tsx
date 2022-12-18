@@ -1,22 +1,8 @@
 import type { FC, MouseEvent, ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 
-import { TextSnippet } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import {
-  Badge,
-  Card,
-  CardActions,
-  CardContent,
-  IconButton,
-  List,
-  Menu,
-  MenuItem,
-  Paper,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { IconButton, List, Menu, MenuItem, Paper, Stack } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
@@ -24,6 +10,7 @@ import { AddItem } from 'components/AddItem/AddItem';
 import { EditableText } from 'components/EditableText/EditableText';
 import { deleteList, updateList } from 'features/lists/listsSlice';
 import type { ListEntityAppType } from 'features/lists/types';
+import { TaskCard } from 'features/tasks/TaskCard';
 import { addTask, fetchTasks, selectTasksByListId } from 'features/tasks/tasksSlice';
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
@@ -34,7 +21,6 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -130,53 +116,10 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
 
       <List sx={{ overflowY: 'auto' }}>
         <SimpleBar autoHide={false} style={{ maxHeight: '72vh', paddingRight: '20px' }}>
-          {(tasks || []).map(task => (
-            <Card
-              onClick={() => handleOpenListDialog(task.id)}
-              key={task.id}
-              sx={[
-                {
-                  wordWrap: 'break-word',
-                  cursor: 'pointer',
-                  marginBottom: '8px',
-                  // marginRight: '20px',
-                  // padding: '10px',
-                },
-                theme => ({
-                  '&:hover': {
-                    backgroundColor: theme.palette.action.hover,
-                  },
-                }),
-              ]}
-            >
-              {/* <CardMedia */}
-              {/*  component="img" */}
-              {/*  height="140" */}
-              {/*  image="https://img.freepik.com/free-photo/blue-iguana-closeup-on-wood_488145-647.jpg?w=2000" */}
-              {/*  alt="green iguana" */}
-              {/* /> */}
-              <CardContent>
-                <Typography gutterBottom variant="subtitle1" component="div">
-                  {task.title}
-                </Typography>
-                {task.description && (
-                  <Typography variant="body2" color="text.secondary">
-                    {task.description}
-                  </Typography>
-                )}
-              </CardContent>
-              <CardActions disableSpacing>
-                {task.description && (
-                  <Tooltip title="this task has description">
-                    <Badge>
-                      <TextSnippet />
-                    </Badge>
-                  </Tooltip>
-                )}
-              </CardActions>
-            </Card>
-          ))}
           {/* <AddItem buttonName="add task" callback={handleAddTask} templateButton /> */}
+          {(tasks || []).map(task => (
+            <TaskCard {...task} key={task.id} onClick={handleOpenListDialog} />
+          ))}
         </SimpleBar>
       </List>
       <AddItem buttonName="add task" callback={handleAddTask} extraControls />
