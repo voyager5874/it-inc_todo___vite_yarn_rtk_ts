@@ -59,9 +59,14 @@ export const TaskCard: FC<TaskCardPropsType> = ({ id, title, description, onClic
         <Typography gutterBottom variant="subtitle1" component="div">
           {title}
         </Typography>
+        {description && description.length < 50 && (
+          <Typography paragraph color="text.secondary">
+            {description}
+          </Typography>
+        )}
       </CardContent>
       <CardActions disableSpacing>
-        {description && (
+        {description && description.length > 50 && (
           <Tooltip title="this task has description">
             <IconButton
               sx={{ borderRadius: '4px', zIndex: '10' }}

@@ -16,12 +16,22 @@ export type TaskEntityAppType = TaskServerModelType;
 //   data: TaskEndpointPostPutModelDataType;
 // };
 
-type DataSubmitThunkArgType = {
+// type DataSubmitThunkArgType = {
+//   listId: string;
+//   taskId: string;
+//   data: Partial<TasksEndpointPostPutModelDataType>;
+// title is obligatory for put requests,
+// this resolves within thunk
+// };
+
+export type UpdateTaskThunkArgType = {
   listId: string;
   taskId: string;
-  data: TasksEndpointPostPutModelDataType;
+  data: Partial<TasksEndpointPostPutModelDataType>;
 };
 
-export type UpdateTaskThunkArgType = DataSubmitThunkArgType;
-
-export type CreateTaskThunkArgType = Omit<DataSubmitThunkArgType, 'taskId'>;
+// export type CreateTaskThunkArgType = Omit<DataSubmitThunkArgType, 'taskId'>;
+export type CreateTaskThunkArgType = {
+  listId: string;
+  data: TasksEndpointPostPutModelDataType;
+};

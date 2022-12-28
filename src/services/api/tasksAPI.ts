@@ -1,9 +1,10 @@
+import { normalizeGetTasksResponseData } from 'services/adapters/normalizeDateTimeString';
 import { baseAxiosInstance } from 'services/api/axiosConfig';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import type {
-  TasksEndpointPostPutModelDataType,
   TaskEndpointPostPutResponseType,
   TasksEndpointGetResponseType,
+  TasksEndpointPostPutModelDataType,
 } from 'services/api/types';
 import { clearObjectEmptyData } from 'utils/clearObjectEmptyData';
 
@@ -17,7 +18,7 @@ export const tasksAPI = {
       .get<TasksEndpointGetResponseType>(
         `todo-lists/${listId}/tasks?count=${count}&page=${page}`,
       )
-      .then(res => res.data);
+      .then(res => normalizeGetTasksResponseData(res.data));
   },
   createTask(listId: string, taskData: TasksEndpointPostPutModelDataType) {
     const data = clearObjectEmptyData(taskData);

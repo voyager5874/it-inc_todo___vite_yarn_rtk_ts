@@ -53,8 +53,8 @@ export const DefaultLayout = (): ReactElement => {
   };
 
   return (
-    <Box sx={{ border: '2px solid red', minHeight: '99vh' }}>
-      <AppBar position="static">
+    <Box sx={{ minHeight: '100vh' }}>
+      <AppBar position="static" sx={{ height: '70px' }}>
         <Toolbar>
           <IconButton
             size="large"

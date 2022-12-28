@@ -14,13 +14,22 @@ import type {
 } from 'features/tasks/types';
 import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
-import type { TaskServerModelType } from 'services/api/types';
+import type {
+  TasksEndpointPostPutModelDataType,
+  TaskServerModelType,
+} from 'services/api/types';
 import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
 
 const tasksAdapter = createEntityAdapter<TaskServerModelType>({
   // selectId: task => task.todoListId,
   sortComparer: (a, b) => a.order - b.order,
 });
+
+export const {
+  selectAll: selectAllTasks,
+  selectById: selectTaskBylId,
+  selectIds: selectTasksIds,
+} = tasksAdapter.getSelectors<RootStateType>(state => state.tasks);
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (id: string) => {
   const response = await tasksAPI.getTasks(id);
@@ -47,9 +56,30 @@ export const addTask = createDataSubmitAsyncThunk(
 
 export const updateTask = createDataSubmitAsyncThunk(
   'tasks/updateTask',
-  async (apiCallData: UpdateTaskThunkArgType, { rejectWithValue }) => {
+  async (apiCallData: UpdateTaskThunkArgType, { rejectWithValue, getState }) => {
     const { listId, taskId, data } = apiCallData;
-    const response = await tasksAPI.updateTask(listId, taskId, data);
+    const currentTaskData = selectTaskBylId(getState(), taskId);
+    let fullData: TasksEndpointPostPutModelDataType = {
+      title: currentTaskData?.title || 'title',
+    };
+
+    if (currentTaskData) {
+      const { status, order, startDate, priority, deadline, description, title } =
+        currentTaskData;
+
+      fullData = {
+        title,
+        status,
+        order,
+        startDate,
+        priority,
+        deadline,
+        description,
+        ...data,
+      };
+    }
+
+    const response = await tasksAPI.updateTask(listId, taskId, fullData);
 
     if (response.resultCode === RequestResultCode.Error) {
       return rejectWithValue({
@@ -123,12 +153,6 @@ const tasksSlice = createSlice({
 
 export const tasksReducer = tasksSlice.reducer;
 
-export const {
-  selectAll: selectAllTasks,
-  selectById: selectTaskBylId,
-  selectIds: selectTasksIds,
-} = tasksAdapter.getSelectors<RootStateType>(state => state.tasks);
-
 // export const selectGoalTasks = createSelector(
 //   [selectAllTasks, (state, goalId) => goalId],
 //   (tasks, goalId) => tasks.filter(task => task.todoListId === goalId),
@@ -137,7 +161,7 @@ export const {
 export const selectTasksByListId = (
   state: RootStateType,
   listId: string,
-): TaskServerModelType[] => state.tasks.sortedByListId[listId];
+): TaskServerModelType[] => state.tasks.sortedByListId[listId] || [];
 
 export const selectTaskTitle = createSelector(selectTaskBylId, task => {
   console.log('taskTitleSelector', task);

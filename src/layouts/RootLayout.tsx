@@ -15,19 +15,17 @@ export const RootLayout = (): ReactElement => {
 
   const auth = useAppSelector(state => state.user.auth);
 
-  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor | undefined>(
-    undefined,
-  );
+  const [alertSeverity, setAlertSeverity] = useState<AlertColor | undefined>(undefined);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const showSnackbar = error || success || info;
+  const showSnackbar = Boolean(error || success || info);
 
   useEffect(() => {
-    if (error) setSnackbarSeverity('error');
-    if (success) setSnackbarSeverity('success');
-    if (info) setSnackbarSeverity('info');
+    if (error) setAlertSeverity('error');
+    if (success) setAlertSeverity('success');
+    if (info) setAlertSeverity('info');
   }, [error, success, info]);
 
   // probably the app router needs optimization
@@ -41,9 +39,9 @@ export const RootLayout = (): ReactElement => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', border: '3px solid green' }} p={0}>
+    <Box sx={{ minHeight: '100vh' }} p={0}>
       <Snackbar open={showSnackbar} autoHideDuration={5000} onClose={handleSnackbarClose}>
-        <Alert variant="filled" severity={snackbarSeverity}>
+        <Alert variant="filled" severity={alertSeverity}>
           {error || success || info}
         </Alert>
       </Snackbar>

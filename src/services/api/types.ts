@@ -65,6 +65,25 @@ export type TasksEndpointGetResponseType = {
 
 export type TasksEndpointPostPutModelDataType = {
   title: string;
+  description?: string | null;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  startDate?: string | null;
+  deadline?: string | null;
+  order?: number;
+};
+
+export type TasksEndpointPostDataType = {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  startDate?: string | null;
+  deadline?: string | null;
+};
+
+export type TasksEndpointPutDataType = {
+  title?: string;
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
@@ -93,7 +112,7 @@ export type TodoListsEndpointDeleteResponseType = FormSubmitResponseType;
 
 export type TodoListPutModelDataType = {
   title: string;
-  order?: number;
+  // order?: number;
 };
 
 export type TodoListEndpointPutResponseType = FormSubmitResponseType;

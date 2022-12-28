@@ -7,8 +7,8 @@ import type {
   RejectedAction,
   RootStateType,
 } from 'app/types';
-import { addList, deleteList } from 'features/lists';
-import { addTask } from 'features/tasks/tasksSlice';
+import { addList, deleteList, updateList } from 'features/lists';
+import { addTask, updateTask } from 'features/tasks/tasksSlice';
 import { authenticateUser, serviceLogin, serviceLogout } from 'features/user/userSlice';
 
 type InitialStateType = {
@@ -56,12 +56,15 @@ const appSlice = createSlice({
       })
       .addMatcher(
         isAnyOf(
+          // isRejectedWithValue but need to exclude auth
           serviceLogin.rejected,
           serviceLogout.rejected,
           deleteList.rejected,
           // authenticateUser.rejected,
           addList.rejected,
           addTask.rejected,
+          updateTask.rejected,
+          updateList.rejected,
         ),
         (state, action) => {
           console.log(action.payload);

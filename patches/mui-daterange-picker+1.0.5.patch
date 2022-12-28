@@ -1,0 +1,200 @@
+diff --git a/node_modules/mui-daterange-picker/dist/index.es.js b/node_modules/mui-daterange-picker/dist/index.es.js
+index e33d93b..e251e63 100644
+--- a/node_modules/mui-daterange-picker/dist/index.es.js
++++ b/node_modules/mui-daterange-picker/dist/index.es.js
+@@ -127,7 +127,7 @@ const Header = ({ date, setDate, nextDisabled, prevDisabled, onClickNext, onClic
+                 React__default.createElement(Select, { value: getMonth(date), onChange: handleMonthChange, MenuProps: { disablePortal: true } }, MONTHS.map((month, idx) => (React__default.createElement(MenuItem, { key: month, value: idx }, month)))))),
+         React__default.createElement(Grid, { item: true },
+             React__default.createElement(FormControl, { variant: "standard" },
+-                React__default.createElement(Select, { value: getYear(date), onChange: handleYearChange, MenuProps: { disablePortal: true } }, generateYears(date, 30).map((year) => (React__default.createElement(MenuItem, { key: year, value: year }, year)))))),
++                React__default.createElement(Select, { value: getYear(date), onChange: handleYearChange, MenuProps: { disablePortal: true } }, generateYears(date, 5).map((year) => (React__default.createElement(MenuItem, { key: year, value: year }, year)))))),
+         React__default.createElement(Grid, { item: true, sx: { padding: '5px' } },
+             React__default.createElement(IconButton, { sx: {
+                     padding: '10px',
+@@ -143,7 +143,8 @@ const Day = ({ startOfRange, endOfRange, disabled, highlighted, outlined, filled
+             display: 'flex',
+             // eslint-disable-next-line no-nested-ternary
+             borderRadius: startOfRange ? '50% 0 0 50%' : endOfRange ? '0 50% 50% 0' : undefined,
+-            backgroundColor: (theme) => !disabled && highlighted ? theme.palette.primary.light : undefined,
++            // backgroundColor: (theme) => !disabled && highlighted ? theme.palette.primary.light : undefined,
++            backgroundColor: (theme) => !disabled && highlighted ? theme.palette.secondary.main : undefined,
+         } },
+         React__default.createElement(IconButton, { sx: Object.assign({ height: '36px', width: '36px', padding: 0, border: (theme) => !disabled && outlined ? `1px solid ${theme.palette.primary.dark}` : undefined }, (!disabled && filled ? {
+                 '&:hover': {
+@@ -156,6 +157,8 @@ const Day = ({ startOfRange, endOfRange, disabled, highlighted, outlined, filled
+                     color: (theme) => !disabled
+                         ? (filled ? theme.palette.primary.contrastText : theme.palette.text.primary)
+                         : theme.palette.text.secondary,
++                        // ? (filled ? 'teal' : 'purple')
++                        // : 'orange',
+                 }, variant: "body2" }, value))));
+ };
+ 
+@@ -355,14 +358,14 @@ const DateRangePickerWrapper = (props) => {
+     const handleKeyPress = (event) => (event === null || event === void 0 ? void 0 : event.key) === 'Escape' && handleToggle();
+     return (React__default.createElement(Box, { sx: { position: 'relative' } },
+         open && (React__default.createElement(Box, { sx: {
+-                position: 'fixed',
+-                height: '100vh',
+-                width: '100vw',
+-                bottom: 0,
+-                zIndex: 0,
+-                right: 0,
+-                left: 0,
+-                top: 0,
++                // position: 'fixed',
++                // height: '100vh',
++                // width: '100vw',
++                // bottom: 0,
++                // zIndex: 0,
++                // right: 0,
++                // left: 0,
++                // top: 0,
+             }, onKeyPress: handleKeyPress, onClick: handleToggle })),
+         React__default.createElement(Box, { sx: { position: 'relative', zIndex: 1 }, className: wrapperClassName },
+             React__default.createElement(DateRangePicker, Object.assign({}, props)))));
+diff --git a/node_modules/mui-daterange-picker/dist/index.js b/node_modules/mui-daterange-picker/dist/index.js
+index 5da3629..fc378e4 100644
+--- a/node_modules/mui-daterange-picker/dist/index.js
++++ b/node_modules/mui-daterange-picker/dist/index.js
+@@ -156,7 +156,7 @@ const Header = ({ date, setDate, nextDisabled, prevDisabled, onClickNext, onClic
+                 React__default["default"].createElement(material.Select, { value: dateFns.getMonth(date), onChange: handleMonthChange, MenuProps: { disablePortal: true } }, MONTHS.map((month, idx) => (React__default["default"].createElement(material.MenuItem, { key: month, value: idx }, month)))))),
+         React__default["default"].createElement(material.Grid, { item: true },
+             React__default["default"].createElement(material.FormControl, { variant: "standard" },
+-                React__default["default"].createElement(material.Select, { value: dateFns.getYear(date), onChange: handleYearChange, MenuProps: { disablePortal: true } }, generateYears(date, 30).map((year) => (React__default["default"].createElement(material.MenuItem, { key: year, value: year }, year)))))),
++                React__default["default"].createElement(material.Select, { value: dateFns.getYear(date), onChange: handleYearChange, MenuProps: { disablePortal: true } }, generateYears(date, 5).map((year) => (React__default["default"].createElement(material.MenuItem, { key: year, value: year }, year)))))),
+         React__default["default"].createElement(material.Grid, { item: true, sx: { padding: '5px' } },
+             React__default["default"].createElement(material.IconButton, { sx: {
+                     padding: '10px',
+@@ -172,7 +172,8 @@ const Day = ({ startOfRange, endOfRange, disabled, highlighted, outlined, filled
+             display: 'flex',
+             // eslint-disable-next-line no-nested-ternary
+             borderRadius: startOfRange ? '50% 0 0 50%' : endOfRange ? '0 50% 50% 0' : undefined,
+-            backgroundColor: (theme) => !disabled && highlighted ? theme.palette.primary.light : undefined,
++            // backgroundColor: (theme) => !disabled && highlighted ? theme.palette.primary.light : undefined,
++            backgroundColor: (theme) => !disabled && highlighted ? 'green' : undefined,
+         } },
+         React__default["default"].createElement(material.IconButton, { sx: Object.assign({ height: '36px', width: '36px', padding: 0, border: (theme) => !disabled && outlined ? `1px solid ${theme.palette.primary.dark}` : undefined }, (!disabled && filled ? {
+                 '&:hover': {
+@@ -183,8 +184,10 @@ const Day = ({ startOfRange, endOfRange, disabled, highlighted, outlined, filled
+             React__default["default"].createElement(material.Typography, { sx: {
+                     lineHeight: 1.6,
+                     color: (theme) => !disabled
+-                        ? (filled ? theme.palette.primary.contrastText : theme.palette.text.primary)
+-                        : theme.palette.text.secondary,
++                        // ? (filled ? theme.palette.primary.contrastText : theme.palette.text.primary)
++                        // : theme.palette.text.secondary,
++                        ? (filled ? 'teal' : 'purple')
++                        : 'orange',
+                 }, variant: "body2" }, value))));
+ };
+ 
+@@ -384,14 +387,14 @@ const DateRangePickerWrapper = (props) => {
+     const handleKeyPress = (event) => (event === null || event === void 0 ? void 0 : event.key) === 'Escape' && handleToggle();
+     return (React__default["default"].createElement(material.Box, { sx: { position: 'relative' } },
+         open && (React__default["default"].createElement(material.Box, { sx: {
+-                position: 'fixed',
+-                height: '100vh',
+-                width: '100vw',
+-                bottom: 0,
+-                zIndex: 0,
+-                right: 0,
+-                left: 0,
+-                top: 0,
++                // position: 'fixed',
++                // height: '100vh',
++                // width: '100vw',
++                // bottom: 0,
++                // zIndex: 0,
++                // right: 0,
++                // left: 0,
++                // top: 0,
+             }, onKeyPress: handleKeyPress, onClick: handleToggle })),
+         React__default["default"].createElement(material.Box, { sx: { position: 'relative', zIndex: 1 }, className: wrapperClassName },
+             React__default["default"].createElement(DateRangePicker, Object.assign({}, props)))));
+diff --git a/node_modules/mui-daterange-picker/src/components/DateRangePickerWrapper.tsx b/node_modules/mui-daterange-picker/src/components/DateRangePickerWrapper.tsx
+index 4d1252d..7bae552 100644
+--- a/node_modules/mui-daterange-picker/src/components/DateRangePickerWrapper.tsx
++++ b/node_modules/mui-daterange-picker/src/components/DateRangePickerWrapper.tsx
+@@ -34,7 +34,7 @@ const DateRangePickerWrapper: React.FunctionComponent<DateRangePickerWrapperProp
+     if (closeOnClickOutside === false) {
+       return;
+     }
+-
++  if(!toggle) return
+     toggle();
+   };
+ 
+@@ -46,14 +46,14 @@ const DateRangePickerWrapper: React.FunctionComponent<DateRangePickerWrapperProp
+         open && (
+           <Box
+             sx={{
+-              position: 'fixed',
+-              height: '100vh',
+-              width: '100vw',
+-              bottom: 0,
+-              zIndex: 0,
+-              right: 0,
+-              left: 0,
+-              top: 0,
++              // position: 'fixed',
++              // height: '100vh',
++              // width: '100vw',
++              // bottom: 0,
++              // zIndex: 0,
++              // right: 0,
++              // left: 0,
++              // top: 0,
+             }}
+             onKeyPress={handleKeyPress}
+             onClick={handleToggle}
+@@ -61,7 +61,8 @@ const DateRangePickerWrapper: React.FunctionComponent<DateRangePickerWrapperProp
+         )
+       }
+ 
+-      <Box sx={{ position: 'relative', zIndex: 1 }} className={wrapperClassName} >
++      {/*<Box sx={{ position: 'relative', zIndex: 1 }} className={wrapperClassName} >*/}
++      <Box sx={{ position: 'relative' }} className={wrapperClassName} >
+         <DateRangePicker {...props} />
+       </Box>
+     </Box>
+diff --git a/node_modules/mui-daterange-picker/src/components/Day.tsx b/node_modules/mui-daterange-picker/src/components/Day.tsx
+index df12ae4..fad5e51 100644
+--- a/node_modules/mui-daterange-picker/src/components/Day.tsx
++++ b/node_modules/mui-daterange-picker/src/components/Day.tsx
+@@ -31,7 +31,8 @@ const Day: React.FunctionComponent<DayProps> = ({
+         display: 'flex',
+         // eslint-disable-next-line no-nested-ternary
+         borderRadius: startOfRange ? '50% 0 0 50%' : endOfRange ? '0 50% 50% 0' : undefined,
+-        backgroundColor: (theme) => !disabled && highlighted ? theme.palette.primary.light : undefined,
++        // backgroundColor: (theme) => !disabled && highlighted ? theme.palette.primary.light : undefined,
++        backgroundColor: (theme) => !disabled && highlighted ? 'green' : undefined,
+       }}
+     >
+       <IconButton
+@@ -56,8 +57,10 @@ const Day: React.FunctionComponent<DayProps> = ({
+           sx={{
+             lineHeight: 1.6,
+             color: (theme) => !disabled
+-              ? (filled ? theme.palette.primary.contrastText : theme.palette.text.primary)
+-              : theme.palette.text.secondary,
++              // ? (filled ? theme.palette.primary.contrastText : theme.palette.text.primary)
++              // : theme.palette.text.secondary,
++              ? (filled ? 'green': 'yellow')
++              : 'teal',
+           }}
+           variant="body2"
+         >
+diff --git a/node_modules/mui-daterange-picker/src/components/Header.tsx b/node_modules/mui-daterange-picker/src/components/Header.tsx
+index d7e6f7d..a7d115b 100644
+--- a/node_modules/mui-daterange-picker/src/components/Header.tsx
++++ b/node_modules/mui-daterange-picker/src/components/Header.tsx
+@@ -83,7 +83,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
+             onChange={handleYearChange}
+             MenuProps={{ disablePortal: true }}
+           >
+-            {generateYears(date, 30).map((year) => (
++            {generateYears(date, 5).map((year) => (
+               <MenuItem key={year} value={year}>
+                 {year}
+               </MenuItem>

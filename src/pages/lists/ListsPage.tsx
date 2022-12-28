@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Stack } from '@mui/material';
+import { Add } from '@mui/icons-material';
+import { Box, Button, Stack } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
@@ -9,6 +10,7 @@ import { AddItem } from 'components/AddItem/AddItem';
 import { addList, fetchLists, ListPaper, selectAllLists } from 'features/lists';
 
 export const ListsPage = (): ReactElement => {
+  const [addItemActive, setAddItemActive] = useState(false);
   const goals = useAppSelector(selectAllLists);
   const dispatch = useAppDispatch();
 
@@ -20,6 +22,10 @@ export const ListsPage = (): ReactElement => {
     dispatch(addList(title));
   };
 
+  const toggleAddItemActive = (): void => {
+    setAddItemActive(prev => !prev);
+  };
+
   return (
     <SimpleBar
       autoHide={false}
@@ -27,7 +33,8 @@ export const ListsPage = (): ReactElement => {
         marginRight: '20px',
         marginLeft: '20px',
         padding: '20px',
-        maxHeight: '90%',
+        height: '92vh',
+        // border: '2px solid purple',
       }}
     >
       <Stack
@@ -37,14 +44,46 @@ export const ListsPage = (): ReactElement => {
         spacing={2}
         sx={{
           width: 'fit-content',
-          minHeight: '90vh',
+          minHeight: '90%',
           // border: '2px solid teal',
         }}
       >
         {goals.map(goal => (
           <ListPaper {...goal} key={goal.id} />
         ))}
-        <AddItem buttonName="Add column" callback={handleAddColumn} backplate />
+        {addItemActive && (
+          <AddItem
+            buttonName="Add column"
+            submit={handleAddColumn}
+            backplate
+            hide={toggleAddItemActive}
+          />
+        )}
+        <Box
+          sx={{
+            // backgroundColor: 'grey',
+            height: '48px',
+            marginRight: '20px',
+            minWidth: '250px',
+            // display: 'flex',
+            gap: '7px',
+            display: addItemActive ? 'none' : 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            onClick={toggleAddItemActive}
+            sx={{
+              padding: '7px 20px 7px 20px',
+              justifyContent: 'flex-start',
+              flexGrow: 1,
+            }}
+            variant="text"
+            startIcon={<Add />}
+          >
+            Add Column
+          </Button>
+        </Box>
       </Stack>
     </SimpleBar>
   );
