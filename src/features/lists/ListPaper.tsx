@@ -24,9 +24,7 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [addFormActive, setAddFormActive] = useState<boolean>(false);
-  // const [titleDivHeight, setTitleDivHeight] = useState<number>(50);
   const scrollbarRef = useRef<SimpleBar>(null);
-  // const scrollAnchor = useRef(null);
   const scrollableNodeRef = useRef<HTMLDivElement>(null);
 
   const { ref: titleBox, height: titleBoxHeight } = useResizeObserver<HTMLDivElement>();
@@ -57,13 +55,13 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   };
 
   const handleDeleteList = (): void => {
-    // dispatch(deleteList('2df82085-3d35-4b4f-9540-309f950078f7'));
+    // dispatch(deleteList('2df82085-3d35-4b4f-9540-309f950078f7')); // this is for generating an error
     dispatch(deleteList(id));
     handleCloseListMenu();
   };
 
   const handleOpenListDialog = (taskId: string): void => {
-    setSelectedTaskId(taskId);
+    setSelectedTaskId(taskId); // useRef ?
     setDialogOpen(true);
   };
 
@@ -84,15 +82,8 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   // );
 
   useEffect(() => {
-    // if (!scrollbarRef.current) return;
-    // scrollbarRef.current.recalculate();
-    // scrollbarRef.current.getScrollElement();
-    // if (!scrollAnchor.current) return;
-    // scrollAnchor.current?.scrollIntoView({ block: 'end' });
-    // scrollAnchor.current?.scrollIntoViewIfNeeded({ block: 'end' });
     if (!scrollableNodeRef.current || !addFormActive) return;
 
-    // scrollableNodeRef.current.scroll();
     scrollableNodeRef.current.scroll({ top: scrollableNodeRef.current.scrollHeight });
   }, [addFormActive]);
 
@@ -115,9 +106,6 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
       elevation={2}
     >
       <Box ref={titleBox} sx={{ padding: '0px 45px 10px 10px', width: '100%' }}>
-        {/* <Typography variant="h5" sx={{ wordBreak: 'break-word' }}> */}
-        {/*  {title} */}
-        {/* </Typography> */}
         <EditableText text={title} submitCallback={handleListTitleUpdate} />
         <IconButton
           sx={{ borderRadius: '0.2em', position: 'absolute', top: '3px', right: '3px' }}
@@ -159,7 +147,6 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
           }}
           ref={scrollbarRef}
         >
-          {/* <AddItem buttonName="add task" callback={handleAddTask} templateButton /> */}
           {tasks.map(task => (
             <TaskCard {...task} key={task.id} onClick={handleOpenListDialog} />
           ))}

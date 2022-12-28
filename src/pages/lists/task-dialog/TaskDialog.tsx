@@ -37,7 +37,6 @@ import {
   SERVER_TASK_MAX_DESCRIPTION_LENGTH,
 } from 'services/api/constants';
 import { TaskStatus } from 'services/api/enums';
-import type { TaskServerModelType } from 'services/api/types';
 
 type ListDialogPropsType = {
   open: boolean;
@@ -55,18 +54,18 @@ const validationSchema = yup.object({
   description: yup.string().max(SERVER_TASK_MAX_DESCRIPTION_LENGTH, '1000 symbols max'),
 });
 
-const dummyTask: TaskServerModelType = {
-  title: 'undefined',
-  id: 'undefined',
-  todoListId: 'undefined',
-  startDate: null,
-  deadline: null,
-  description: null,
-  addedDate: 'undefined',
-  order: 0,
-  priority: 0,
-  status: 0,
-};
+// const dummyTask: TaskServerModelType = {
+//   title: 'undefined',
+//   id: 'undefined',
+//   todoListId: 'undefined',
+//   startDate: null,
+//   deadline: null,
+//   description: null,
+//   addedDate: 'undefined',
+//   order: 0,
+//   priority: 0,
+//   status: 0,
+// };
 
 export const TaskDialog: FC<ListDialogPropsType> = ({
   open,
@@ -183,7 +182,6 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
   };
 
   const renderScheduleButtonContent = (): ReactElement | null => {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     if (!task?.deadline) return null;
     if (task?.startDate && task?.deadline) {
       return (
@@ -191,11 +189,6 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
           <Box>{format(new Date(task.startDate), 'dd MMM. yyyy')}</Box>
           <Box sx={{ marginLeft: '5px', marginRight: '5px' }}>-</Box>
           <Box>{format(new Date(task.deadline), 'dd MMM. HH:mm yyyy')}</Box>
-          {/* <Box>{new Date(task.deadline).toLocaleString()}</Box> */}
-          {/* <Box> */}
-          {/*  {formatInTimeZone(new Date(task.deadline), '+00:00', 'yyyy-MM-dd HH:mm')} */}
-          {/* </Box> */}
-          {/* <Box>{new Date(task.deadline).toUTCString()}</Box> */}
         </>
       );
     }
@@ -294,7 +287,11 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
                         }}
                       >
                         <TaskDatesMenuContent
-                          task={task || dummyTask}
+                          // task={task || dummyTask}
+                          id={taskId}
+                          todoListId={listId}
+                          startDate={task.startDate}
+                          deadline={task.deadline}
                           open={datesPopup.isOpen}
                           toggle={datesPopup.toggle}
                         />
@@ -389,7 +386,11 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
               }}
             >
               <TaskDatesMenuContent
-                task={task || dummyTask}
+                // task={task || dummyTask}
+                id={taskId}
+                todoListId={listId}
+                startDate={task?.startDate ?? null}
+                deadline={task?.deadline ?? null}
                 open={popupState.isOpen}
                 toggle={popupState.toggle}
               />

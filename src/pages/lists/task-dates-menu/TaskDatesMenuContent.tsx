@@ -33,10 +33,13 @@ import { DateRangePicker } from 'mui-daterange-picker';
 
 import { useAppDispatch } from 'app/hooks';
 import { updateTask } from 'features/tasks/tasksSlice';
-import type { TaskServerModelType } from 'services/api/types';
 
 type TaskDateMenuContentPropsType = {
-  task: TaskServerModelType;
+  // task: TaskServerModelType;
+  id: string;
+  todoListId: string;
+  startDate: string | null;
+  deadline: string | null;
   open: boolean;
   toggle: () => void;
 };
@@ -70,11 +73,15 @@ const determineDeadline = (
 };
 
 export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
-  task,
+  // task,
+  id,
+  todoListId,
+  startDate,
+  deadline,
   open,
   toggle,
 }) => {
-  const { id, todoListId, startDate, deadline } = task;
+  // const { id, todoListId, startDate, deadline } = task;
 
   const [pickedStartDate, setPickedStartDate] = useState<Date | null>(
     determineStartDate(startDate),
@@ -87,6 +94,23 @@ export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
   const [startUsed, setStartUsed] = useState(Boolean(startDate));
 
   const dispatch = useAppDispatch();
+
+  const defineMenuTitle = (): string => {
+    if (deadline && startUsed) {
+      return 'Change task schedule';
+    }
+    if (!deadline && startUsed) {
+      return 'Set task time-frame';
+    }
+    if (deadline && !startUsed) {
+      return 'Change task due date';
+    }
+    if (!deadline && !startUsed) {
+      return 'Set task due date';
+    }
+
+    return 'Task schedule';
+  };
 
   const handleDeadlineChange = (newValue: Date | null): void => {
     if (!newValue) return;
@@ -107,7 +131,6 @@ export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
     let deadlineDateIso: string | null = null;
 
     if (startUsed && start) {
-      // startDateIso = formatISO(start).slice(0, -6);
       startDateIso = formatISO(start);
       // date-fns formatISO formats date as (local time +- offset; (msk -> +03:00)
       // server respond with (converted to GMT time)+00:00 but saves only converted to GMT time, ie 18:00msk -> 15:00
@@ -118,16 +141,9 @@ export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
       // In other words: If a date/time is created in GMT (Greenwich Mean Time), the date/time will
       // be converted to CDT (Central US Daylight Time) if a user browses from central US.' - I don't see a conversion
       // Omitting T or Z in a date-time string can give different results in different browsers.
-      // probably, if the server assumes GMT time, I need to force adding GMT marker within getter functions,
-      // and it'll be converted to local time with new Date
-      // or send GMT ('Z' or +00:00 ended), use formatInTimeZone(new Date(task.deadline), '+00:00', 'yyyy-MM-dd HH:mm')
-      //  and treat the time as if it were local -> adapter?
     }
     if (end) {
-      // deadlineDateIso = formatISO(end).slice(0, -6);
-      // deadlineDateIso = end.toUTCString();
       deadlineDateIso = formatISO(end);
-      // deadlineDateIso = end.toISOString();
     }
     dispatch(
       updateTask({
@@ -162,11 +178,10 @@ export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
           minWidth: '300px',
           minHeight: '300px',
           padding: '0px 20px 20px 20px',
-          // backgroundColor: 'brown',
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography>{startUsed ? 'Set time-frame' : 'Set due date'}</Typography>
+          <Typography>{defineMenuTitle()}</Typography>
           <IconButton onClick={toggle}>
             <Close />
           </IconButton>
@@ -212,7 +227,7 @@ export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
             ampm={false}
             hideTabs={false}
             showToolbar
-            label="Current due date"
+            label={deadline ? 'Current due date' : 'Due date not set yet'}
             value={pickedDeadline || add(startOfDay(new Date()), { days: 1, hours: 12 })}
             onChange={handleDeadlineChange}
             // displayStaticWrapperAs="desktop"
