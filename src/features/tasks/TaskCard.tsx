@@ -1,5 +1,5 @@
 import type { FC, MouseEvent } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { TextSnippet } from '@mui/icons-material';
 import {
@@ -34,75 +34,55 @@ export const TaskCard: FC<TaskCardPropsType> = ({
 }) => {
   const [cardContentExpanded, setCardContentExpanded] = useState(false);
   const [underAction, setUnderAction] = useState(false);
-  // const [contextMenu, setContextMenu] = useState<{
-  //   mouseX: number;
-  //   mouseY: number;
-  // } | null>(null);
+
+  const cardRef = useRef<Element | null>(null);
 
   const handleExpandClick = (e: MouseEvent<HTMLSpanElement>): void => {
     e.stopPropagation();
     setCardContentExpanded(!cardContentExpanded);
   };
 
-  const calendarMenuControl = usePopupState({
-    variant: 'popover',
-    popupId: 'cardCalendarMenu',
-  });
-
   const contextMenuControl = usePopupState({
     variant: 'popover',
     popupId: 'cardRightClickMenu',
   });
 
-  const handleCardClick = (): void => {
+  const calendarMenuControl = usePopupState({
+    variant: 'popover',
+    popupId: 'cardCalendarMenu',
+  });
+
+  const cardOnLeftClick = (): void => {
     if (contextMenuControl.isOpen || calendarMenuControl.isOpen) return;
     onClick(id);
   };
 
+  const cardOnRightClick = (e: MouseEvent): void => {
+    e.preventDefault();
+    calendarMenuControl.close();
+    cardRef.current = e.currentTarget;
+    contextMenuControl.toggle(e);
+    setUnderAction(true);
+  };
+
   useEffect(() => {
-    if (!contextMenuControl.isOpen) {
+    if (!contextMenuControl.isOpen && !calendarMenuControl.isOpen) {
       setUnderAction(false);
     }
-  }, [contextMenuControl.isOpen]);
+  }, [contextMenuControl.isOpen, calendarMenuControl.isOpen]);
 
-  // useEffect(() => {
-  //   if (!calendarMenuControl.isOpen) {
-  //     contextMenuControl.close();
-  //   }
-  // }, [calendarMenuControl.isOpen, contextMenuControl.close]);
-
-  // const handleContextMenu = (event: MouseEvent) => {
-  //   event.preventDefault();
-  //   setContextMenu(
-  //     contextMenu === null
-  //       ? {
-  //           mouseX: event.clientX + 10,
-  //           mouseY: event.clientY - 6,
-  //         }
-  //       : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-  //         // Other native context menus might behave different.
-  //         // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-  //         null,
-  //   );
-  // };
-
-  const handleOpenContextMenu = (e: MouseEvent): void => {
+  const handleOpenCalendarMenu = (e: MouseEvent): void => {
     e.preventDefault();
-    // if (contextMenuControl.isOpen || calendarMenuControl.isOpen) return;
-    calendarMenuControl.close();
-    // if (contextMenuControl.isOpen) {
-    //   contextMenuControl.close();
-    // }
-    contextMenuControl.toggle(e);
-
-    setUnderAction(true);
+    if (!cardRef.current) return;
+    calendarMenuControl.open(cardRef.current);
+    contextMenuControl.close();
   };
 
   return (
     <Card
       {...bindContextMenu(contextMenuControl)}
-      onContextMenu={handleOpenContextMenu}
-      onClick={handleCardClick}
+      onContextMenu={cardOnRightClick}
+      onClick={cardOnLeftClick}
       sx={[
         {
           backgroundColor: underAction ? 'purple' : '',
@@ -147,7 +127,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({
           </Tooltip>
         )}
       </CardActions>
-      <Collapse in={cardContentExpanded} timeout="auto" unmountOnExit>
+      <Collapse in={cardContentExpanded} timeout="auto">
         <CardContent>
           <Typography paragraph color="text.secondary">
             {description}
@@ -159,25 +139,17 @@ export const TaskCard: FC<TaskCardPropsType> = ({
         anchorReference="anchorEl"
         anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
         transformOrigin={{ vertical: 'center', horizontal: 'left' }}
-        // open={contextMenu !== null}
-        // onClose={handleClose}
-        // anchorReference="anchorPosition"
-        // anchorPosition={
-        //   contextMenu !== null
-        //     ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-        //     : undefined
-        // }
       >
         <MenuItem>Priority</MenuItem>
-        <MenuItem {...bindTrigger(calendarMenuControl)}>Calendar</MenuItem>
+        <MenuItem {...bindTrigger(calendarMenuControl)} onClick={handleOpenCalendarMenu}>
+          Calendar
+        </MenuItem>
         <MenuItem>Move</MenuItem>
         <MenuItem>Delete</MenuItem>
       </Menu>
       <Menu
         {...bindMenu(calendarMenuControl)}
-        // onClose={handleCalendarMenuClose}
-        // anchorReference="anchorEl"
-        anchorOrigin={{ vertical: 'center', horizontal: 'left' }}
+        anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
         transformOrigin={{ vertical: 'center', horizontal: 'left' }}
       >
         <TaskDatesMenuContent

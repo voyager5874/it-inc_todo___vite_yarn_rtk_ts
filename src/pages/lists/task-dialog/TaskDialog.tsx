@@ -181,6 +181,7 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
     );
   };
 
+  // make this a component ? or return it back to the rest of markup?
   const renderScheduleButtonContent = (): ReactElement | null => {
     if (!task?.deadline) return null;
     if (task?.startDate && task?.deadline) {
@@ -236,7 +237,7 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
                   variant="popover"
                   popupId="task-dates-menu"
                   parentPopupState={null}
-                  disableAutoFocus
+                  disableAutoFocus={false}
                 >
                   {datesPopup => (
                     <>
