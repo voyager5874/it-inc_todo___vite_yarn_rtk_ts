@@ -8,9 +8,9 @@ import {
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
 import type { UpdateListThunkArgType } from 'features/lists/types';
+import type { ListServerModelType } from 'services/api';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
-import type { ListServerModelType } from 'services/api/types';
 import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
 
 const listsAdapter = createEntityAdapter<ListServerModelType>({

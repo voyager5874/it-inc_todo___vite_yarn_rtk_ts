@@ -16,6 +16,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { ConfirmProvider } from 'material-ui-confirm';
 import { bindMenu, bindToggle } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { NavLink, Outlet } from 'react-router-dom';
@@ -137,7 +138,9 @@ export const DefaultLayout = (): ReactElement => {
         </Toolbar>
         {appBusy === 'busy' && <LinearProgress />}
       </AppBar>
-      <Outlet />
+      <ConfirmProvider>
+        <Outlet />
+      </ConfirmProvider>
     </Box>
   );
 };

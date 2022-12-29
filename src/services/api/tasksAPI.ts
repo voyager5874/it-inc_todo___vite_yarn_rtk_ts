@@ -2,6 +2,7 @@ import { normalizeGetTasksResponseData } from 'services/adapters/normalizeDateTi
 import { baseAxiosInstance } from 'services/api/axiosConfig';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import type {
+  TaskEndpointDeleteResponseType,
   TaskEndpointPostPutResponseType,
   TasksEndpointGetResponseType,
   TasksEndpointPostPutModelDataType,
@@ -36,6 +37,11 @@ export const tasksAPI = {
 
     return baseAxiosInstance
       .put<TaskEndpointPostPutResponseType>(`todo-lists/${listId}/tasks/${taskId}`, data)
+      .then(res => res.data);
+  },
+  deleteTask(listId: string, taskId: string) {
+    return baseAxiosInstance
+      .delete<TaskEndpointDeleteResponseType>(`/todo-lists/${listId}/tasks/${taskId}`)
       .then(res => res.data);
   },
 };

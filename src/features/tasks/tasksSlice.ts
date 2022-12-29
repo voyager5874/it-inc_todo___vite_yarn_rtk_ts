@@ -10,6 +10,7 @@ import type { EntityLoadingStatusType, RootStateType } from 'app';
 import { addList, deleteList } from 'features/lists';
 import type {
   CreateTaskThunkArgType,
+  TaskIdentityType,
   UpdateTaskThunkArgType,
 } from 'features/tasks/types';
 import { RequestResultCode } from 'services/api/enums';
@@ -92,6 +93,23 @@ export const updateTask = createDataSubmitAsyncThunk(
   },
 );
 
+export const deleteTask = createDataSubmitAsyncThunk(
+  'tasks/deleteTask',
+  async (apiCallData: TaskIdentityType, { rejectWithValue }) => {
+    const { listId, taskId } = apiCallData;
+    const response = await tasksAPI.deleteTask(listId, taskId);
+
+    if (response.resultCode === RequestResultCode.Error) {
+      return rejectWithValue({
+        messages: response.messages,
+        fieldsErrors: response.fieldsErrors,
+      });
+    }
+
+    return apiCallData;
+  },
+);
+
 const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: 'idle' as EntityLoadingStatusType,
@@ -147,6 +165,18 @@ const tasksSlice = createSlice({
 
         tasksAdapter.removeMany(state, tasksIds);
         delete state.sortedByListId[action.payload.listId];
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        const { listId, taskId } = action.payload;
+
+        tasksAdapter.removeOne(state, taskId);
+        const taskIndex = state.sortedByListId[listId].findIndex(
+          task => task.id === taskId,
+        );
+
+        if (taskIndex) {
+          state.sortedByListId[listId].splice(taskIndex, 1);
+        }
       });
   },
 });

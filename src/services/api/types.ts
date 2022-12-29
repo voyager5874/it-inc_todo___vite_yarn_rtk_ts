@@ -95,6 +95,8 @@ export type TaskEndpointPostPutResponseType = FormSubmitResponseType<{
   item: TaskServerModelType;
 }>;
 
+export type TaskEndpointDeleteResponseType = FormSubmitResponseType;
+
 export type ListServerModelType = {
   id: string;
   title: string;

@@ -13,9 +13,12 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { useConfirm } from 'material-ui-confirm';
 import { bindContextMenu, bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
+import { useAppDispatch } from 'app/hooks';
+import { deleteTask } from 'features/tasks/tasksSlice';
 import type { TaskEntityAppType } from 'features/tasks/types';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
 
@@ -35,7 +38,11 @@ export const TaskCard: FC<TaskCardPropsType> = ({
   const [cardContentExpanded, setCardContentExpanded] = useState(false);
   const [underAction, setUnderAction] = useState(false);
 
+  const dispatch = useAppDispatch();
+
   const cardRef = useRef<Element | null>(null);
+
+  const confirm = useConfirm();
 
   const handleExpandClick = (e: MouseEvent<HTMLSpanElement>): void => {
     e.stopPropagation();
@@ -76,6 +83,14 @@ export const TaskCard: FC<TaskCardPropsType> = ({
     if (!cardRef.current) return;
     calendarMenuControl.open(cardRef.current);
     contextMenuControl.close();
+  };
+
+  const handleTaskDelete = (): void => {
+    confirm({ title: 'Delete task', description: 'This action is permanent' }).then(
+      () => {
+        dispatch(deleteTask({ listId: todoListId, taskId: id }));
+      },
+    );
   };
 
   return (
@@ -145,7 +160,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({
           Calendar
         </MenuItem>
         <MenuItem>Move</MenuItem>
-        <MenuItem>Delete</MenuItem>
+        <MenuItem onClick={handleTaskDelete}>Delete</MenuItem>
       </Menu>
       <Menu
         {...bindMenu(calendarMenuControl)}

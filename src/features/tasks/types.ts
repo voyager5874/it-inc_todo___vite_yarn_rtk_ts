@@ -24,9 +24,12 @@ export type TaskEntityAppType = TaskServerModelType;
 // this resolves within thunk
 // };
 
-export type UpdateTaskThunkArgType = {
+export type TaskIdentityType = {
   listId: string;
   taskId: string;
+};
+
+export type UpdateTaskThunkArgType = TaskIdentityType & {
   data: Partial<TasksEndpointPostPutModelDataType>;
 };
 
