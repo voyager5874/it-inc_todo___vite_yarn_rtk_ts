@@ -1,47 +1,41 @@
-import type { MouseEvent, ReactElement } from 'react';
-import { useContext, useState } from 'react';
+import type { ReactElement } from 'react';
+import { useContext } from 'react';
 
-import { AccountCircle } from '@mui/icons-material';
+import { AccountCircle, DarkMode, Logout, Settings } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Avatar,
   Box,
+  Divider,
   IconButton,
   LinearProgress,
-  Link,
+  ListItemIcon,
   Menu,
   MenuItem,
   Toolbar,
   Typography,
 } from '@mui/material';
+import { bindMenu, bindToggle } from 'material-ui-popup-state';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { NavLink, Outlet } from 'react-router-dom';
 
 import { ColorModeContext } from 'app/App';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { serviceLogout } from 'features/user/userSlice';
 
-const pages = ['user', 'lists'];
-
 export const DefaultLayout = (): ReactElement => {
   const avatar = useAppSelector(state => state.user.photoLarge);
   const appBusy = useAppSelector(state => state.app.status);
+
   const colorMode = useContext(ColorModeContext);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const accountMenuControl = usePopupState({
+    variant: 'popover',
+    popupId: 'appBarAccountMenu',
+  });
 
   const dispatch = useAppDispatch();
-
-  // const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-  //   setAuth(event.target.checked);
-  // };
-
-  const handleMenu = (event: MouseEvent<HTMLElement>): void => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = (): void => {
-    setAnchorEl(null);
-  };
 
   const handleLogout = (): void => {
     dispatch(serviceLogout());
@@ -49,7 +43,7 @@ export const DefaultLayout = (): ReactElement => {
 
   const handleToggleTheme = (): void => {
     colorMode.toggleColorMode();
-    handleClose();
+    accountMenuControl.close();
   };
 
   return (
@@ -68,29 +62,13 @@ export const DefaultLayout = (): ReactElement => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Task tracker
           </Typography>
-          <Box sx={{ flexGrow: 1, display: 'flex', gap: '10px' }}>
-            {pages.map(page => (
-              <Link
-                component={NavLink}
-                to={`/${page}`}
-                key={page}
-                sx={{
-                  my: 2,
-                  color: 'white',
-                  display: 'block',
-                }}
-              >
-                {page}
-              </Link>
-            ))}
-          </Box>
-          <div>
+          <Box>
             <IconButton
+              {...bindToggle(accountMenuControl)}
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              onClick={handleMenu}
               color="inherit"
             >
               <Avatar src={avatar} alt="avatar">
@@ -98,27 +76,64 @@ export const DefaultLayout = (): ReactElement => {
               </Avatar>
             </IconButton>
             <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+              {...bindMenu(accountMenuControl)}
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: 'visible',
+                  filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                  mt: 1.5,
+                  '& .MuiAvatar-root': {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  '&:before': {
+                    content: '""',
+                    display: 'block',
+                    position: 'absolute',
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: 'background.paper',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    zIndex: 0,
+                  },
+                },
               }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-              <MenuItem component={NavLink} to="/user">
-                Profile
+              <MenuItem
+                component={NavLink}
+                to="/user"
+                onMouseUp={accountMenuControl.close}
+              >
+                <Avatar /> Profile
               </MenuItem>
-              <MenuItem onClick={handleClose}>My account</MenuItem>
-              <MenuItem onClick={handleToggleTheme}>toggle theme</MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <Divider />
+              <MenuItem>
+                <ListItemIcon>
+                  <Settings fontSize="small" />
+                </ListItemIcon>
+                Settings
+              </MenuItem>
+              <MenuItem onClick={handleToggleTheme}>
+                <ListItemIcon>
+                  <DarkMode fontSize="small" />
+                </ListItemIcon>
+                Toggle dark mode
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <ListItemIcon>
+                  <Logout fontSize="small" />
+                </ListItemIcon>
+                Logout
+              </MenuItem>
             </Menu>
-          </div>
+          </Box>
         </Toolbar>
         {appBusy === 'busy' && <LinearProgress />}
       </AppBar>
