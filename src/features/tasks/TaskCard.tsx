@@ -86,11 +86,15 @@ export const TaskCard: FC<TaskCardPropsType> = ({
   };
 
   const handleTaskDelete = (): void => {
-    confirm({ title: 'Delete task', description: 'This action is permanent' }).then(
-      () => {
-        dispatch(deleteTask({ listId: todoListId, taskId: id }));
-      },
-    );
+    contextMenuControl.close();
+
+    confirm({
+      title: 'Delete task',
+      description: `Delete ${title}? This action is permanent.`,
+    }).then(() => {
+      dispatch(deleteTask({ listId: todoListId, taskId: id }));
+    });
+    // .catch(() => contextMenuControl.close());
   };
 
   return (

@@ -174,7 +174,7 @@ const tasksSlice = createSlice({
           task => task.id === taskId,
         );
 
-        if (taskIndex) {
+        if (taskIndex !== -1) {
           state.sortedByListId[listId].splice(taskIndex, 1);
         }
       });
