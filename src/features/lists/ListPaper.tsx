@@ -1,9 +1,12 @@
-import type { FC, MouseEvent, ReactElement } from 'react';
+import type { FC, ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Add, Style } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, IconButton, List, Menu, MenuItem, Paper } from '@mui/material';
+import { useConfirm } from 'material-ui-confirm';
+import { bindMenu, bindToggle } from 'material-ui-popup-state';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import SimpleBar from 'simplebar-react';
 import useResizeObserver from 'use-resize-observer';
 
@@ -20,7 +23,6 @@ import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement => {
   const tasks = useAppSelector(state => selectTasksByListId(state, id));
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [addFormActive, setAddFormActive] = useState<boolean>(false);
@@ -28,6 +30,13 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   const scrollableNodeRef = useRef<HTMLDivElement>(null);
 
   const { ref: titleBox, height: titleBoxHeight } = useResizeObserver<HTMLDivElement>();
+
+  const listMenuControl = usePopupState({
+    variant: 'popover',
+    popupId: 'list-menu',
+  });
+
+  const confirm = useConfirm();
 
   const dispatch = useAppDispatch();
 
@@ -46,18 +55,13 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
     // toggleForm();
   };
 
-  const handleMenu = (event: MouseEvent<HTMLElement>): void => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseListMenu = (): void => {
-    setAnchorEl(null);
-  };
-
   const handleDeleteList = (): void => {
     // dispatch(deleteList('2df82085-3d35-4b4f-9540-309f950078f7')); // this is for generating an error
-    dispatch(deleteList(id));
-    handleCloseListMenu();
+    listMenuControl.close();
+    confirm({
+      title: 'Delete list',
+      description: `Delete ${title}? This action is permanent.`,
+    }).then(() => dispatch(deleteList(id)));
   };
 
   const handleOpenListDialog = (taskId: string): void => {
@@ -110,28 +114,24 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
         <IconButton
           sx={{ borderRadius: '0.2em', position: 'absolute', top: '3px', right: '3px' }}
           aria-label="list menu"
-          aria-controls="menu-appbar"
           aria-haspopup="true"
-          onClick={handleMenu}
+          {...bindToggle(listMenuControl)}
         >
           <MoreHorizIcon />
         </IconButton>
         <Menu
-          id="menu-list"
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-          open={Boolean(anchorEl)}
-          onClose={handleCloseListMenu}
+          {...bindMenu(listMenuControl)}
+          // anchorOrigin={{
+          //   vertical: 'top',
+          //   horizontal: 'right',
+          // }}
+          // transformOrigin={{
+          //   vertical: 'top',
+          //   horizontal: 'left',
+          // }}
         >
           <MenuItem onClick={handleDeleteList}>Delete List</MenuItem>
-          <MenuItem onClick={handleCloseListMenu}>Add task</MenuItem>
+          <MenuItem onClick={listMenuControl.close}>Add task</MenuItem>
         </Menu>
       </Box>
 
