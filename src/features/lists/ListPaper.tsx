@@ -23,11 +23,12 @@ import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement => {
   const tasks = useAppSelector(state => selectTasksByListId(state, id));
 
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [addFormActive, setAddFormActive] = useState<boolean>(false);
-  const scrollbarRef = useRef<SimpleBar>(null);
+
   const scrollableNodeRef = useRef<HTMLDivElement>(null);
+  const scrollbarRef = useRef<SimpleBar>(null);
+  const selectedTaskId = useRef<string | null>(null);
 
   const { ref: titleBox, height: titleBoxHeight } = useResizeObserver<HTMLDivElement>();
 
@@ -65,8 +66,8 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   };
 
   const handleOpenListDialog = (taskId: string): void => {
-    setSelectedTaskId(taskId); // useRef ?
-    setDialogOpen(true);
+    selectedTaskId.current = taskId;
+    setDialogOpen(true); // use popup-state?
   };
 
   const handleListTitleUpdate = useCallback(
@@ -188,10 +189,10 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
         </IconButton>
       </Box>
       <TaskDialog
-        open={dialogOpen}
+        open={dialogOpen && Boolean(selectedTaskId.current)}
         setOpen={setDialogOpen}
         listId={id}
-        taskId={selectedTaskId!}
+        taskId={selectedTaskId.current!}
       />
     </Paper>
   );
