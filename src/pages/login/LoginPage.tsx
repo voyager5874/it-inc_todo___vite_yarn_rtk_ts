@@ -26,9 +26,14 @@ export const LoginPage = (): ReactElement => {
         minHeight: '99vh',
       }}
     >
-      <Stack justifyContent="flex-start" gap={1.5} mb={3}>
+      <Stack
+        justifyContent="flex-start"
+        gap={1.5}
+        mb={3}
+        sx={{ textAlign: 'left', minWidth: '30em' }}
+      >
         <Typography variant="body1">
-          To log in get registered at&nbsp;
+          Register at&nbsp;
           <Link
             href="https://social-network.samuraijs.com/"
             target="_blank"
