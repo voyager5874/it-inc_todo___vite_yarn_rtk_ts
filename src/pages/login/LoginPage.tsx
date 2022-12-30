@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
-import { Stack } from '@mui/material';
+import { Link, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from 'app/hooks';
@@ -26,6 +26,22 @@ export const LoginPage = (): ReactElement => {
         minHeight: '99vh',
       }}
     >
+      <Stack justifyContent="flex-start" gap={1.5} mb={3}>
+        <Typography variant="body1">
+          To log in get registered at&nbsp;
+          <Link
+            href="https://social-network.samuraijs.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            social-network.samuraijs.com
+          </Link>
+        </Typography>
+        <Typography variant="body1">or use test account credentials:</Typography>
+        <Typography variant="body1">email: free@samuraijs.com</Typography>
+        <Typography variant="body1">password: free</Typography>
+      </Stack>
+
       <LoginForm />
     </Stack>
   );

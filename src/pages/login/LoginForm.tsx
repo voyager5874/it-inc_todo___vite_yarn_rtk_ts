@@ -27,8 +27,8 @@ const validationSchema = yup.object({
 });
 
 const initialValues: LoginParamsType = {
-  email: import.meta.env.VITE_MY_EMAIL || '',
-  password: import.meta.env.VITE_MY_PASSWORD || '',
+  email: import.meta.env.VITE_MY_EMAIL || 'free@samuraijs.com',
+  password: import.meta.env.VITE_MY_PASSWORD || 'free',
   rememberMe: true,
 };
 
