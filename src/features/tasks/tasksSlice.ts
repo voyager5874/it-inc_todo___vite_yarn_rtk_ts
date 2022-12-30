@@ -13,6 +13,7 @@ import type {
   TaskIdentityType,
   UpdateTaskThunkArgType,
 } from 'features/tasks/types';
+import { serviceLogout } from 'features/user/userSlice';
 import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
 import type {
@@ -177,7 +178,8 @@ const tasksSlice = createSlice({
         if (taskIndex !== -1) {
           state.sortedByListId[listId].splice(taskIndex, 1);
         }
-      });
+      })
+      .addCase(serviceLogout.fulfilled, () => initialState);
   },
 });
 

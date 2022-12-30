@@ -1,5 +1,5 @@
 import type { MouseEvent, ReactElement } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { Login, Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -35,7 +35,7 @@ const initialValues: LoginParamsType = {
 };
 
 export const LoginForm = (): ReactElement => {
-  const serverErrorMessage = useRef<string>('');
+  // const serverErrorMessage = useRef<string>('');
   const dispatch = useAppDispatch();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +54,9 @@ export const LoginForm = (): ReactElement => {
           });
         }
 
-        serverErrorMessage.current = res?.payload?.messages.join(', ') || '';
+        // serverErrorMessage.current = res?.payload?.messages.join(', ') || '';
+        if (res?.payload?.messages.length)
+          helpers.setStatus(res.payload.messages.join(', ') || '');
       }
       helpers.setSubmitting(false);
     },
@@ -68,8 +70,9 @@ export const LoginForm = (): ReactElement => {
   };
 
   const resetErrorMessage = (): void => {
-    if (serverErrorMessage.current) {
-      serverErrorMessage.current = '';
+    if (formik.status) {
+      // serverErrorMessage.current = '';
+      formik.setStatus('');
     }
   };
 
@@ -179,7 +182,8 @@ export const LoginForm = (): ReactElement => {
         mt={4}
         sx={{ height: '1.5em', textAlign: 'center', color: 'red' }}
       >
-        {serverErrorMessage.current}
+        {/* {serverErrorMessage.current} */}
+        {formik.status}
       </Typography>
     </Box>
   );

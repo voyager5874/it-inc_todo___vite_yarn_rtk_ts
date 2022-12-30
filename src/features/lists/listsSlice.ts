@@ -8,6 +8,7 @@ import {
 
 import type { EntityLoadingStatusType, RootStateType } from 'app';
 import type { UpdateListThunkArgType } from 'features/lists/types';
+import { serviceLogout } from 'features/user/userSlice';
 import type { ListServerModelType } from 'services/api';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
@@ -100,6 +101,9 @@ const listsSlice = createSlice({
         const { listId, data } = action.payload;
 
         listsAdapter.updateOne(state, { id: listId, changes: data });
+      })
+      .addCase(serviceLogout.fulfilled, () => {
+        return initialState;
       });
   },
 });
