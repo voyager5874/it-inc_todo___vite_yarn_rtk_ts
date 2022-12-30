@@ -1,10 +1,10 @@
 import type { MouseEvent, ReactElement } from 'react';
 import { useRef, useState } from 'react';
 
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Login, Visibility, VisibilityOff } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
 import {
   Box,
-  Button,
   Checkbox,
   FormControlLabel,
   IconButton,
@@ -14,8 +14,8 @@ import {
 } from '@mui/material';
 import { isRejectedWithValue } from '@reduxjs/toolkit';
 import { useFormik } from 'formik';
-// import * as yup from 'yup';
 
+// import * as yup from 'yup';
 import { useAppDispatch } from 'app/hooks';
 import { serviceLogin } from 'features/user/userSlice';
 import type { LoginParamsType } from 'services/api/types';
@@ -152,15 +152,27 @@ export const LoginForm = (): ReactElement => {
           }
           label="remember me"
         />
-        <Button
+        {/* <Button */}
+        {/*  color="primary" */}
+        {/*  variant="contained" */}
+        {/*  fullWidth */}
+        {/*  type="submit" */}
+        {/*  disabled={formik.isSubmitting} */}
+        {/* > */}
+        {/*  Login */}
+        {/* </Button> */}
+        <LoadingButton
+          loadingPosition="start"
+          startIcon={<Login />}
           color="primary"
           variant="contained"
           fullWidth
           type="submit"
           disabled={formik.isSubmitting}
+          loading={formik.isSubmitting}
         >
-          Submit
-        </Button>
+          Login
+        </LoadingButton>
       </form>
       <Typography
         variant="body2"

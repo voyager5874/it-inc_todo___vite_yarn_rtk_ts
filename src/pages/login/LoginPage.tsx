@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
-import { Link, Stack, Typography } from '@mui/material';
+import { Box, Link, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from 'app/hooks';
@@ -43,8 +43,12 @@ export const LoginPage = (): ReactElement => {
           </Link>
         </Typography>
         <Typography variant="body1">or use test account credentials:</Typography>
-        <Typography variant="body1">email: free@samuraijs.com</Typography>
-        <Typography variant="body1">password: free</Typography>
+        <Typography variant="body1">
+          email: free@samuraijs.com
+          <Box component="span" mx={3}>
+            password: free
+          </Box>
+        </Typography>
       </Stack>
 
       <LoginForm />
