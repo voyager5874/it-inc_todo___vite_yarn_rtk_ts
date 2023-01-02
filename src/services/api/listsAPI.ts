@@ -1,3 +1,5 @@
+import type { AxiosRequestConfig } from 'axios';
+
 import { baseAxiosInstance } from './axiosConfig';
 
 import type {
@@ -9,9 +11,9 @@ import type {
 } from 'services/api/types';
 
 export const listsAPI = {
-  getLists() {
+  getLists(config?: AxiosRequestConfig) {
     return baseAxiosInstance
-      .get<TodoListsEndpointGetResponseType>('todo-lists')
+      .get<TodoListsEndpointGetResponseType>('todo-lists', config)
       .then(res => res.data);
   },
   createList(title: string) {

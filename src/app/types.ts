@@ -11,3 +11,9 @@ type GenericAsyncThunk = AsyncThunk<unknown, unknown, any>;
 export type FulfilledAction = ReturnType<GenericAsyncThunk['fulfilled']>;
 export type PendingAction = ReturnType<GenericAsyncThunk['pending']>;
 export type RejectedAction = ReturnType<GenericAsyncThunk['rejected']>;
+
+export type AppThunkApiType = {
+  // Optional fields for defining thunkApi field types
+  dispatch: AppDispatchType;
+  state: RootStateType;
+};

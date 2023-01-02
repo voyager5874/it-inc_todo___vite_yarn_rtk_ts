@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Add } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
@@ -7,16 +7,65 @@ import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
-import { addList, fetchLists, ListPaper, selectAllLists } from 'features/lists';
+import {
+  addList,
+  fetchLists,
+  ListPaper,
+  selectAllLists,
+  selectListsFetchStatus,
+} from 'features/lists';
 
 export const ListsPage = (): ReactElement => {
   const [addItemActive, setAddItemActive] = useState(false);
-  const goals = useAppSelector(selectAllLists);
+
+  const fetchAbortRef = useRef<Function | null>(null);
+
+  const lists = useAppSelector(selectAllLists);
+  const listsFetchStatus = useAppSelector(selectListsFetchStatus);
+
   const dispatch = useAppDispatch();
 
+  // const fetchListsThunk = useMemo(
+  //   () => bindActionCreators(fetchLists, dispatch),
+  //   [dispatch],
+  // );
+
   useEffect(() => {
-    dispatch(fetchLists());
-  }, [dispatch]);
+    const request = () => {
+      if (listsFetchStatus === 'failed' || listsFetchStatus === 'idle') {
+        return dispatch(fetchLists());
+      }
+    };
+
+    const promise = request();
+
+    if (promise) {
+      fetchAbortRef.current = promise.abort;
+    }
+    // return () => {
+    // if (thunk) thunk.abort();
+    // cancel your running thunk before it has finished
+    // it will dispatch (and return) a "thunkName/rejected" action (not a Promise!)
+    //
+    // Should I cancel running network request before unmount?
+    // I'm gonna need the data anyway
+    // I'm cancelling because of another request which will be made due to react 18 strict mode
+    // though condition option within thunk will prevent new request if there is loading: 'succeeded'
+    // this two useEffects plus extraneous dependency on lists.loading is rather ugly solution,
+    // so I will probably rely on the first fetch request and dismiss the second via condition
+    // until rtk query is here
+    //
+    // fetching in effects means your app can't produce useful html with SSR
+    // using framework fetching mechanism or rtk query is the recommended way
+    // https://github.com/facebook/react/issues/24502
+    // };
+  }, [listsFetchStatus, dispatch]);
+
+  useEffect(() => {
+    return () => {
+      if (fetchAbortRef.current) fetchAbortRef.current();
+    };
+  }, []);
 
   const handleAddColumn = (title: string): void => {
     dispatch(addList(title));
@@ -48,8 +97,8 @@ export const ListsPage = (): ReactElement => {
           // border: '2px solid teal',
         }}
       >
-        {goals.map(goal => (
-          <ListPaper {...goal} key={goal.id} />
+        {lists.map(list => (
+          <ListPaper {...list} key={list.id} />
         ))}
         {addItemActive && (
           <AddItem

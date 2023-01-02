@@ -14,7 +14,7 @@ import type {
   UpdateTaskThunkArgType,
 } from 'features/tasks/types';
 import { serviceLogout } from 'features/user/userSlice';
-import { RequestResultCode } from 'services/api/enums';
+import { RequestResultCode, TaskPriority, TaskStatus } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
 import type {
   TasksEndpointPostPutModelDataType,
@@ -195,6 +195,11 @@ export const selectTasksByListId = (
   listId: string,
 ): TaskServerModelType[] => state.tasks.sortedByListId[listId] || [];
 
+// Adding a separate selector function for every single field is not a good idea!
+// That ends up turning Redux into something resembling a Java class with getter/setter functions for every field.
+// It's not going to improve the code, and it's probably going to make the code worse - maintaining all those extra
+// selectors is a lot of additional effort, and it will be harder to trace what values are being used where.
+
 export const selectTaskTitle = createSelector(selectTaskBylId, task => {
   console.log('taskTitleSelector', task);
   if (task) {
@@ -228,4 +233,27 @@ export const selectTaskStatus = createSelector(selectTaskBylId, task =>
 
 export const selectTaskParentId = createSelector(selectTaskBylId, task =>
   task ? task.todoListId : 'selectTaskParentId: task access error',
+);
+
+export const selectCompletedTasksOfList = createSelector(selectTasksByListId, tasks =>
+  tasks.length ? tasks.filter(task => task.status === TaskStatus.Completed) : [],
+);
+
+export const selectLowPriorityTasksOfList = createSelector(selectTasksByListId, tasks =>
+  tasks.length ? tasks.filter(task => task.priority === TaskPriority.Low) : [],
+);
+
+export const selectHighPriorityTasksOfList = createSelector(selectTasksByListId, tasks =>
+  tasks.length ? tasks.filter(task => task.priority === TaskPriority.High) : [],
+);
+
+export const selectTasksOfListByPriority = createSelector(
+  selectTasksByListId,
+  (state: RootStateType, priority: TaskPriority) => priority,
+  (tasks, priority) =>
+    tasks.length ? tasks.filter(task => task.priority === priority) : [],
+);
+
+export const selectAllCompletedTasks = createSelector(selectAllTasks, tasks =>
+  tasks.length ? tasks.filter(task => task.status === TaskStatus.Completed) : [],
 );

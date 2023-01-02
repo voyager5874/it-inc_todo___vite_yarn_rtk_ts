@@ -1,5 +1,5 @@
-import type { FC, ReactElement } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ReactElement } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Add, Style } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -20,10 +20,10 @@ import { addTask, fetchTasks, selectTasksByListId } from 'features/tasks/tasksSl
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 
-export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement => {
+export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement => {
   const tasks = useAppSelector(state => selectTasksByListId(state, id));
 
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false); // use popup-state
   const [addFormActive, setAddFormActive] = useState<boolean>(false);
 
   const scrollableNodeRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,11 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchTasks(id));
+    const thunk = dispatch(fetchTasks(id));
+
+    return () => {
+      thunk.abort();
+    };
   }, [id, dispatch]);
 
   const toggleForm = (): void => {
@@ -177,7 +181,11 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
       >
         <Button
           onClick={toggleForm}
-          sx={{ padding: '7px 20px 7px 20px', justifyContent: 'flex-start', flexGrow: 1 }}
+          sx={{
+            padding: '7px 20px 7px 20px',
+            justifyContent: 'flex-start',
+            flexGrow: 1,
+          }}
           variant="text"
           startIcon={<Add />}
         >
@@ -196,4 +204,4 @@ export const ListPaper: FC<ListEntityAppType> = ({ title, id }): ReactElement =>
       />
     </Paper>
   );
-};
+});

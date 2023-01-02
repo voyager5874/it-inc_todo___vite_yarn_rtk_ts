@@ -5,11 +5,12 @@ import {
   createSelector,
   createSlice,
 } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-import type { EntityLoadingStatusType, RootStateType } from 'app';
+import type { EntityLoadingStatusType, RootStateType, AppThunkApiType } from 'app';
 import type { UpdateListThunkArgType } from 'features/lists/types';
 import { serviceLogout } from 'features/user/userSlice';
-import type { ListServerModelType } from 'services/api';
+import type { ListServerModelType, TodoListsEndpointGetResponseType } from 'services/api';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
 import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
@@ -18,9 +19,36 @@ const listsAdapter = createEntityAdapter<ListServerModelType>({
   sortComparer: (a, b) => b.order - a.order,
 });
 
-export const fetchLists = createAsyncThunk('lists/fetchLists', async () => {
-  return listsAPI.getLists();
-});
+export const fetchLists = createAsyncThunk<
+  TodoListsEndpointGetResponseType,
+  undefined,
+  AppThunkApiType
+>(
+  'lists/fetchLists',
+  async (_, { signal }) => {
+    const source = axios.CancelToken.source();
+
+    signal.addEventListener('abort', () => {
+      source.cancel();
+    });
+    const response = await listsAPI.getLists({
+      cancelToken: source.token,
+    });
+
+    return response;
+  },
+  {
+    condition: (_, { getState }) => {
+      const { lists, user } = getState();
+      const fetchStatus = lists.loading;
+      const { auth } = user;
+
+      if (fetchStatus === 'succeeded' || fetchStatus === 'loading' || !auth) {
+        return false;
+      }
+    },
+  },
+);
 
 export const addList = createDataSubmitAsyncThunk(
   'lists/addList',
@@ -88,8 +116,24 @@ const listsSlice = createSlice({
   },
   extraReducers: builder => {
     builder
+      .addCase(fetchLists.pending, (state, action) => {
+        if (state.loading !== 'loading') {
+          state.loading = 'loading';
+        }
+        console.log('fetchLists.pending action.meta', action.meta);
+      })
+      .addCase(fetchLists.rejected, (state, action) => {
+        if (state.loading !== 'failed') {
+          state.loading = 'failed';
+        }
+        console.log('fetchLists.rej action.meta', action.meta);
+      })
       .addCase(fetchLists.fulfilled, (state, action) => {
+        if (state.loading !== 'succeeded') {
+          state.loading = 'succeeded';
+        }
         listsAdapter.setAll(state, action.payload);
+        console.log('fetchLists.fulfilled action.meta', action.meta);
       })
       .addCase(addList.fulfilled, (state, action) => {
         listsAdapter.addOne(state, action.payload);
@@ -119,3 +163,5 @@ export const {
 export const selectListTitle = createSelector(selectListById, list =>
   list ? list.title : 'list access error',
 );
+
+export const selectListsFetchStatus = (state: RootStateType) => state.lists.loading;
