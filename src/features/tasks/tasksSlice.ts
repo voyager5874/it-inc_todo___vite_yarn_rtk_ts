@@ -5,15 +5,18 @@ import {
   createSelector,
   createSlice,
 } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-import type { EntityLoadingStatusType, RootStateType } from 'app';
-import { addList, deleteList } from 'features/lists';
+import type { AppThunkApiType, RootStateType } from 'app';
+import { addList, deleteList, selectListById } from 'features/lists';
 import type {
   CreateTaskThunkArgType,
+  FetchTasksReturnType,
   TaskIdentityType,
   UpdateTaskThunkArgType,
 } from 'features/tasks/types';
 import { serviceLogout } from 'features/user/userSlice';
+import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import { RequestResultCode, TaskPriority, TaskStatus } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
 import type {
@@ -33,11 +36,44 @@ export const {
   selectIds: selectTasksIds,
 } = tasksAdapter.getSelectors<RootStateType>(state => state.tasks);
 
-export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (id: string) => {
-  const response = await tasksAPI.getTasks(id);
+export const selectTasksByListId = (
+  state: RootStateType,
+  listId: string,
+): TaskServerModelType[] => state.tasks.sortedByListId[listId] || [];
 
-  return { tasks: response.items, listId: id };
-});
+export const fetchTasks = createAsyncThunk<FetchTasksReturnType, string, AppThunkApiType>(
+  'tasks/fetchTasks',
+  async (id: string, { signal }) => {
+    const source = axios.CancelToken.source();
+
+    signal.addEventListener('abort', () => {
+      source.cancel();
+    });
+    // dispatch(tasksOfListRequested(id));
+    const response = await tasksAPI.getTasks(id, SERVER_MAX_TASKS_PER_REQUEST, 1, {
+      cancelToken: source.token,
+    });
+
+    return { tasks: response.items, listId: id, tasksTotalCount: response.totalCount };
+  },
+  {
+    condition: (id, { getState }) => {
+      const requested = getState().tasks.loading;
+
+      if (requested.includes(id)) return false;
+
+      const tasks = selectTasksByListId(getState(), id);
+      const list = selectListById(getState(), id);
+      const taskCountReceived = tasks.length;
+      // const taskCountReceived = tasks?.sortedByListId[id].length || null; // I have the selector
+      const tasksCountTotal = list?.tasksTotalCount;
+
+      if (tasksCountTotal !== null && tasksCountTotal === taskCountReceived) {
+        return false;
+      }
+    },
+  },
+);
 
 export const addTask = createDataSubmitAsyncThunk(
   'tasks/addTask',
@@ -113,7 +149,8 @@ export const deleteTask = createDataSubmitAsyncThunk(
 
 const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
-  loading: 'idle' as EntityLoadingStatusType,
+  // loading: 'idle' as EntityLoadingStatusType,
+  loading: [] as string[],
   sortedByListId: {} as Record<string, TaskServerModelType[]>,
 });
 
@@ -122,20 +159,39 @@ const tasksSlice = createSlice({
   initialState,
   reducers: {
     taskAdded: tasksAdapter.addOne,
-    tasksReceived(state, action: PayloadAction<{ tasks: TaskServerModelType[] }>) {
+    tasksReceived: (state, action: PayloadAction<{ tasks: TaskServerModelType[] }>) => {
       const { tasks } = action.payload;
 
       tasksAdapter.upsertMany(state, tasks);
       state.sortedByListId[tasks[0].todoListId] = tasks;
     },
+    tasksOfListRequested: (state, action: PayloadAction<{ listId: string }>) => {
+      state.loading.push(action.payload.listId);
+    },
   },
   extraReducers: builder => {
     builder
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        const { tasks } = action.payload;
+        const { tasks, listId } = action.payload;
 
         tasksAdapter.setMany(state, tasks);
         state.sortedByListId[action.payload.listId] = tasks;
+        const idIndex = state.loading.indexOf(listId);
+
+        if (idIndex !== -1) {
+          state.loading.splice(idIndex, 1);
+        }
+      })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        const listId = action.meta.arg;
+        const idIndex = state.loading.indexOf(listId);
+
+        if (idIndex !== -1) {
+          state.loading.splice(idIndex, 1);
+        }
+      })
+      .addCase(fetchTasks.pending, (state, action) => {
+        state.loading.push(action.meta.arg);
       })
       .addCase(addTask.fulfilled, (state, action) => {
         const { listId, taskData } = action.payload;
@@ -189,11 +245,6 @@ export const tasksReducer = tasksSlice.reducer;
 //   [selectAllTasks, (state, goalId) => goalId],
 //   (tasks, goalId) => tasks.filter(task => task.todoListId === goalId),
 // );
-
-export const selectTasksByListId = (
-  state: RootStateType,
-  listId: string,
-): TaskServerModelType[] => state.tasks.sortedByListId[listId] || [];
 
 // Adding a separate selector function for every single field is not a good idea!
 // That ends up turning Redux into something resembling a Java class with getter/setter functions for every field.

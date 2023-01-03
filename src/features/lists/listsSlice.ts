@@ -1,4 +1,3 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -7,20 +6,20 @@ import {
 } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-import type { EntityLoadingStatusType, RootStateType, AppThunkApiType } from 'app';
-import type { UpdateListThunkArgType } from 'features/lists/types';
+import type { AppThunkApiType, EntityLoadingStatusType, RootStateType } from 'app';
+import type { ListEntityAppType, UpdateListThunkArgType } from 'features/lists/types';
+import { fetchTasks } from 'features/tasks/tasksSlice';
 import { serviceLogout } from 'features/user/userSlice';
-import type { ListServerModelType, TodoListsEndpointGetResponseType } from 'services/api';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
 import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
 
-const listsAdapter = createEntityAdapter<ListServerModelType>({
+const listsAdapter = createEntityAdapter<ListEntityAppType>({
   sortComparer: (a, b) => b.order - a.order,
 });
 
 export const fetchLists = createAsyncThunk<
-  TodoListsEndpointGetResponseType,
+  ListEntityAppType[],
   undefined,
   AppThunkApiType
 >(
@@ -110,9 +109,9 @@ const listsSlice = createSlice({
   initialState,
   reducers: {
     listAdded: listsAdapter.addOne,
-    listsReceived(state, action: PayloadAction<{ lists: ListServerModelType[] }>) {
-      listsAdapter.setAll(state, action.payload.lists);
-    },
+    // listsReceived(state, action: PayloadAction<{ lists: ListServerModelType[] }>) {
+    //   listsAdapter.setAll(state, action.payload.lists);
+    // },
   },
   extraReducers: builder => {
     builder
@@ -148,6 +147,11 @@ const listsSlice = createSlice({
       })
       .addCase(serviceLogout.fulfilled, () => {
         return initialState;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        const { tasksTotalCount, listId } = action.payload;
+
+        listsAdapter.updateOne(state, { id: listId, changes: { tasksTotalCount } });
       });
   },
 });
@@ -164,4 +168,5 @@ export const selectListTitle = createSelector(selectListById, list =>
   list ? list.title : 'list access error',
 );
 
-export const selectListsFetchStatus = (state: RootStateType) => state.lists.loading;
+export const selectListsFetchStatus = (state: RootStateType): EntityLoadingStatusType =>
+  state.lists.loading;

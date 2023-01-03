@@ -42,11 +42,15 @@ export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement =
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const thunk = dispatch(fetchTasks(id));
+    // If this was a separate page for a given list, then canceling the request would be crucial
+    // without cleanup, going to other list page would cause two or more requests running, any of
+    // which could be last settled and hence displayed
+    dispatch(fetchTasks(id));
+    // const thunk = dispatch(fetchTasks(id));
 
-    return () => {
-      thunk.abort();
-    };
+    // return () => {
+    //   thunk.abort();
+    // };
   }, [id, dispatch]);
 
   const toggleForm = (): void => {

@@ -38,3 +38,9 @@ export type CreateTaskThunkArgType = {
   listId: string;
   data: TasksEndpointPostPutModelDataType;
 };
+
+export type FetchTasksReturnType = {
+  tasks: TaskServerModelType[];
+  listId: string;
+  tasksTotalCount: number;
+};

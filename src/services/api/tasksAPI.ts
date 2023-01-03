@@ -1,3 +1,5 @@
+import type { AxiosRequestConfig } from 'axios';
+
 import { normalizeGetTasksResponseData } from 'services/adapters/normalizeDateTimeString';
 import { baseAxiosInstance } from 'services/api/axiosConfig';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
@@ -14,10 +16,12 @@ export const tasksAPI = {
     listId: string,
     count: string | number = SERVER_MAX_TASKS_PER_REQUEST,
     page: number | string = 1,
+    config?: AxiosRequestConfig,
   ) {
     return baseAxiosInstance
       .get<TasksEndpointGetResponseType>(
         `todo-lists/${listId}/tasks?count=${count}&page=${page}`,
+        config,
       )
       .then(res => normalizeGetTasksResponseData(res.data));
   },
