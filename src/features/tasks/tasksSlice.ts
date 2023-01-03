@@ -4,6 +4,7 @@ import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  isAnyOf,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -149,7 +150,6 @@ export const deleteTask = createDataSubmitAsyncThunk(
 
 const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
-  // loading: 'idle' as EntityLoadingStatusType,
   loading: [] as string[],
   sortedByListId: {} as Record<string, TaskServerModelType[]>,
 });
@@ -172,23 +172,10 @@ const tasksSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        const { tasks, listId } = action.payload;
+        const { tasks } = action.payload;
 
         tasksAdapter.setMany(state, tasks);
         state.sortedByListId[action.payload.listId] = tasks;
-        const idIndex = state.loading.indexOf(listId);
-
-        if (idIndex !== -1) {
-          state.loading.splice(idIndex, 1);
-        }
-      })
-      .addCase(fetchTasks.rejected, (state, action) => {
-        const listId = action.meta.arg;
-        const idIndex = state.loading.indexOf(listId);
-
-        if (idIndex !== -1) {
-          state.loading.splice(idIndex, 1);
-        }
       })
       .addCase(fetchTasks.pending, (state, action) => {
         state.loading.push(action.meta.arg);
@@ -235,7 +222,15 @@ const tasksSlice = createSlice({
           state.sortedByListId[listId].splice(taskIndex, 1);
         }
       })
-      .addCase(serviceLogout.fulfilled, () => initialState);
+      .addCase(serviceLogout.fulfilled, () => initialState)
+      .addMatcher(isAnyOf(fetchTasks.rejected, fetchTasks.fulfilled), (state, action) => {
+        const listId = action.meta.arg;
+        const idIndex = state.loading.indexOf(listId);
+
+        if (idIndex !== -1) {
+          state.loading.splice(idIndex, 1);
+        }
+      });
   },
 });
 
