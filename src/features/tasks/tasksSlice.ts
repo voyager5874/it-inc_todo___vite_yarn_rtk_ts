@@ -44,10 +44,16 @@ export const selectTasksByListId = (
 
 export const fetchTasks = createAsyncThunk<FetchTasksReturnType, string, AppThunkApiType>(
   'tasks/fetchTasks',
-  async (id: string, { signal }) => {
+  async (id: string, { signal, dispatch }) => {
     const source = axios.CancelToken.source();
 
     signal.addEventListener('abort', () => {
+      // this is temp, just playing around
+      // without this dispatch, second request happens while the .rejected action due to abort  of
+      // the first is still not dispatched, so condition returns false
+      // this is probably better than watching loading status within a component
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      dispatch(tasksSlice.actions.fetchTasksOfListRequestEnded({ listId: id }));
       source.cancel();
     });
     // dispatch(tasksOfListRequested(id));
@@ -168,6 +174,13 @@ const tasksSlice = createSlice({
     tasksOfListRequested: (state, action: PayloadAction<{ listId: string }>) => {
       state.loading.push(action.payload.listId);
     },
+    fetchTasksOfListRequestEnded: (state, action: PayloadAction<{ listId: string }>) => {
+      const idIndex = state.loading.indexOf(action.payload.listId);
+
+      if (idIndex !== -1) {
+        state.loading.splice(idIndex, 1);
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -245,6 +258,8 @@ export const tasksReducer = tasksSlice.reducer;
 // That ends up turning Redux into something resembling a Java class with getter/setter functions for every field.
 // It's not going to improve the code, and it's probably going to make the code worse - maintaining all those extra
 // selectors is a lot of additional effort, and it will be harder to trace what values are being used where.
+
+// output selector should always have the transformation logic
 
 export const selectTaskTitle = createSelector(selectTaskBylId, task => {
   console.log('taskTitleSelector', task);
