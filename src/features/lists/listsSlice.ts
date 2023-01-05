@@ -7,6 +7,8 @@ import {
 import axios from 'axios';
 
 import type { AppThunkApiType, EntityLoadingStatusType, RootStateType } from 'app';
+import { startAppListening } from 'app/listenerMiddleware';
+import { MAX_REQUEST_ATTEMPTS } from 'constants/settings';
 import type { ListEntityAppType, UpdateListThunkArgType } from 'features/lists/types';
 import { fetchTasks } from 'features/tasks/tasksSlice';
 import { serviceLogout } from 'features/user/userSlice';
@@ -30,11 +32,10 @@ export const fetchLists = createAsyncThunk<
     signal.addEventListener('abort', () => {
       source.cancel();
     });
-    const response = await listsAPI.getLists({
+
+    return listsAPI.getLists({
       cancelToken: source.token,
     });
-
-    return response;
   },
   {
     condition: (_, { getState }) => {
@@ -101,6 +102,7 @@ export const updateList = createDataSubmitAsyncThunk(
 
 const initialState = listsAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
+  fetchAttempts: 0,
   loading: 'idle' as EntityLoadingStatusType,
 });
 
@@ -117,6 +119,7 @@ const listsSlice = createSlice({
     builder
       .addCase(fetchLists.pending, (state, action) => {
         if (state.loading !== 'loading') {
+          state.fetchAttempts += 1;
           state.loading = 'loading';
         }
         console.log('fetchLists.pending action.meta', action.meta);
@@ -170,3 +173,17 @@ export const selectListTitle = createSelector(selectListById, list =>
 
 export const selectListsFetchStatus = (state: RootStateType): EntityLoadingStatusType =>
   state.lists.loading;
+
+startAppListening({
+  predicate: (action, currentState) => {
+    // Trigger logic whenever this field changes
+    return (
+      currentState.lists.loading === 'failed' &&
+      currentState.lists.fetchAttempts < MAX_REQUEST_ATTEMPTS
+    );
+  },
+  effect: (action, { dispatch }) => {
+    console.log('listener dispatched fetchLists');
+    dispatch(fetchLists());
+  },
+});
