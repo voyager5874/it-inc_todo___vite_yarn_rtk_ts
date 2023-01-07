@@ -12,56 +12,12 @@ import { addList, fetchLists, ListPaper, selectAllLists } from 'features/lists';
 export const ListsPage = (): ReactElement => {
   const [addItemActive, setAddItemActive] = useState(false);
 
-  // const fetchAbortRef = useRef<Function | null>(null);
-
   const lists = useAppSelector(selectAllLists);
-  // const listsFetchStatus = useAppSelector(selectListsFetchStatus);
 
   const dispatch = useAppDispatch();
 
-  // const fetchListsThunk = useMemo(
-  //   () => bindActionCreators(fetchLists, dispatch),
-  //   [dispatch],
-  // );
-
-  // useEffect(() => {
-  //   const request = () => {
-  //     if (listsFetchStatus === 'failed' || listsFetchStatus === 'idle') {
-  //       return dispatch(fetchLists());
-  //     }
-  //   };
-  //
-  //   const promise = request();
-  //
-  //   if (promise) {
-  //     fetchAbortRef.current = promise.abort;
-  //   }
-  //   // return () => {
-  //   // if (thunk) thunk.abort();
-  //   // cancel your running thunk before it has finished
-  //   // it will dispatch (and return) a "thunkName/rejected" action (not a Promise!)
-  //   //
-  //   // Should I cancel running network request before unmount?
-  //   // I'm gonna need the data anyway
-  //   // I'm cancelling because of another request which will be made due to react 18 strict mode
-  //   // though condition option within thunk will prevent new request if there is loading: 'succeeded'
-  //   // this two useEffects plus extraneous dependency on lists.loading is rather ugly solution,
-  //   // so I will probably rely on the first fetch request and dismiss the second via condition
-  //   // until rtk query is here
-  //   //
-  //   // fetching in effects means your app can't produce useful html with SSR
-  //   // using framework fetching mechanism or rtk query is the recommended way
-  //   // https://github.com/facebook/react/issues/24502
-  //   // };
-  // }, [listsFetchStatus, dispatch]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (fetchAbortRef.current) fetchAbortRef.current();
-  //   };
-  // }, []);
-
   useEffect(() => {
+    // I could listen for state.auth === true
     const request = dispatch(fetchLists());
 
     return () => {

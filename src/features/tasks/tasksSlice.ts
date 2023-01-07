@@ -9,7 +9,14 @@ import {
 import axios from 'axios';
 
 import type { AppThunkApiType, RootStateType } from 'app';
-import { addList, deleteList, selectListById } from 'features/lists';
+import { startAppListening } from 'app/listenerMiddleware';
+import {
+  addList,
+  deleteList,
+  fetchLists,
+  selectListById,
+  selectListsIds,
+} from 'features/lists';
 import type {
   CreateTaskThunkArgType,
   FetchTasksReturnType,
@@ -51,7 +58,6 @@ export const fetchTasks = createAsyncThunk<FetchTasksReturnType, string, AppThun
       // this is temp, just playing around
       // without this dispatch, second request happens while the .rejected action due to abort  of
       // the first is still not dispatched, so condition returns false
-      // this is probably better than watching loading status within a component
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       dispatch(tasksSlice.actions.fetchTasksOfListRequestEnded({ listId: id }));
       source.cancel();
@@ -157,6 +163,7 @@ export const deleteTask = createDataSubmitAsyncThunk(
 const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: [] as string[],
+  fetchAttempts: 0,
   sortedByListId: {} as Record<string, TaskServerModelType[]>,
 });
 
@@ -164,16 +171,19 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    taskAdded: tasksAdapter.addOne,
-    tasksReceived: (state, action: PayloadAction<{ tasks: TaskServerModelType[] }>) => {
-      const { tasks } = action.payload;
-
-      tasksAdapter.upsertMany(state, tasks);
-      state.sortedByListId[tasks[0].todoListId] = tasks;
+    tasksOfAllListsRequested: state => {
+      state.fetchAttempts += 1;
     },
-    tasksOfListRequested: (state, action: PayloadAction<{ listId: string }>) => {
-      state.loading.push(action.payload.listId);
-    },
+    // taskAdded: tasksAdapter.addOne,
+    // tasksReceived: (state, action: PayloadAction<{ tasks: TaskServerModelType[] }>) => {
+    //   const { tasks } = action.payload;
+    //
+    //   tasksAdapter.upsertMany(state, tasks);
+    //   state.sortedByListId[tasks[0].todoListId] = tasks;
+    // },
+    // tasksOfListRequested: (state, action: PayloadAction<{ listId: string }>) => {
+    //   state.loading.push(action.payload.listId);
+    // },
     fetchTasksOfListRequestEnded: (state, action: PayloadAction<{ listId: string }>) => {
       const idIndex = state.loading.indexOf(action.payload.listId);
 
@@ -318,3 +328,56 @@ export const selectTasksOfListByPriority = createSelector(
 export const selectAllCompletedTasks = createSelector(selectAllTasks, tasks =>
   tasks.length ? tasks.filter(task => task.status === TaskStatus.Completed) : [],
 );
+
+// Every time an action is dispatched, each listener will be checked to see
+// if it should run based on the current action vs the comparison option provided.
+
+// startAppListening({
+//   predicate: (action, currentState) => {
+//     if (currentState.tasks.fetchAttempts > MAX_REQUEST_ATTEMPTS) return false;
+//     const lists = selectListsIds(currentState) as string[];
+//     const tasksReceived = lists.every(
+//       id =>
+//         Object.hasOwn(currentState.tasks.sortedByListId, id) &&
+//         selectListById(currentState, id)?.tasksTotalCount !== null,
+//     );
+//
+//     return (
+//       currentState.lists.loading === 'succeeded' &&
+//       !currentState.tasks.loading.length &&
+//       !tasksReceived
+//     );
+//   },
+//   effect: async (action, { dispatch, getState, condition, subscribe, unsubscribe }) => {
+//     unsubscribe()
+//     const lists = selectListsIds(getState()) as string[];
+//
+//     lists.forEach(listId => {
+//       console.log('tasks requested', listId);
+//       dispatch(fetchTasks(listId));
+//     });
+//     dispatch(tasksSlice.actions.tasksOfAllListsRequested());
+//     console.log('all tasks requested');
+//     console.log('loading', getState().tasks.loading);
+//     await condition(() => getState().tasks.loading.length === 0);
+//     //await condition((action, currentState) => currentState.tasks.loading.length === 0);
+//     subscribe()
+//     console.log('loading', getState().tasks.loading);
+//     console.log('loading que is empty');
+//   },
+// });
+
+startAppListening({
+  // type: 'lists/fetchLists/fulfilled',
+  predicate: action => {
+    return fetchLists.fulfilled.match(action);
+  },
+  effect: async (action, { dispatch, getState }) => {
+    const lists = selectListsIds(getState()) as string[];
+
+    lists.forEach(listId => {
+      dispatch(fetchTasks(listId));
+    });
+    dispatch(tasksSlice.actions.tasksOfAllListsRequested());
+  },
+});

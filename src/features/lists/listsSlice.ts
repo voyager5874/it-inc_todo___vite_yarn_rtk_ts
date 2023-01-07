@@ -175,15 +175,14 @@ export const selectListsFetchStatus = (state: RootStateType): EntityLoadingStatu
   state.lists.loading;
 
 startAppListening({
-  predicate: (action, currentState) => {
-    // Trigger logic whenever this field changes
-    return (
-      currentState.lists.loading === 'failed' &&
-      currentState.lists.fetchAttempts < MAX_REQUEST_ATTEMPTS
-    );
+  predicate: action => {
+    return fetchLists.rejected.match(action);
   },
-  effect: (action, { dispatch }) => {
+  effect: (action, { dispatch, getState, unsubscribe }) => {
     console.log('listener dispatched fetchLists');
     dispatch(fetchLists());
+    if (getState().lists.fetchAttempts > MAX_REQUEST_ATTEMPTS) {
+      unsubscribe();
+    }
   },
 });

@@ -16,7 +16,7 @@ import { EditableText } from 'components/EditableText/EditableText';
 import { deleteList, updateList } from 'features/lists/listsSlice';
 import type { ListEntityAppType } from 'features/lists/types';
 import { TaskCard } from 'features/tasks/TaskCard';
-import { addTask, fetchTasks, selectTasksByListId } from 'features/tasks/tasksSlice';
+import { addTask, selectTasksByListId } from 'features/tasks/tasksSlice';
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 
@@ -41,17 +41,17 @@ export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement =
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    // If this was a separate page for a given list, then canceling the request would be crucial
-    // without cleanup, going to other list page would cause two or more requests running, any of
-    // which could be last settled and hence displayed
-    // dispatch(fetchTasks(id));
-    const thunk = dispatch(fetchTasks(id));
-
-    return () => {
-      thunk.abort();
-    };
-  }, [id, dispatch]);
+  // useEffect(() => {
+  //   // If this was a separate page for a given list, then canceling the request would be crucial
+  //   // without cleanup, going to other list page would cause two or more requests running, any of
+  //   // which could be last settled and hence displayed
+  //   // dispatch(fetchTasks(id));
+  //   const thunk = dispatch(fetchTasks(id));
+  //
+  //   return () => {
+  //     thunk.abort();
+  //   };
+  // }, [id, dispatch]);
 
   const toggleForm = (): void => {
     setAddFormActive(prev => !prev);
@@ -73,7 +73,7 @@ export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement =
     }).then(() => dispatch(deleteList(id)));
   };
 
-  const handleOpenListDialog = (taskId: string): void => {
+  const handleOpenTaskDialog = (taskId: string): void => {
     selectedTaskId.current = taskId;
     setDialogOpen(true); // use popup-state?
   };
@@ -157,7 +157,7 @@ export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement =
           ref={scrollbarRef}
         >
           {tasks.map(task => (
-            <TaskCard {...task} key={task.id} onClick={handleOpenListDialog} />
+            <TaskCard {...task} key={task.id} onClick={handleOpenTaskDialog} />
           ))}
           {addFormActive && (
             <AddItem
