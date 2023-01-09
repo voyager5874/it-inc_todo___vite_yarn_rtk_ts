@@ -30,7 +30,7 @@ import * as yup from 'yup';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { selectListTitle } from 'features/lists';
-import { selectTaskBylId, selectTaskTitle, updateTask } from 'features/tasks/tasksSlice';
+import { selectTaskById, selectTaskTitle, updateTask } from 'features/tasks';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
 import {
   SERVER_ENTITY_MAX_TITLE_LENGTH,
@@ -74,7 +74,7 @@ export const TaskDialog: FC<ListDialogPropsType> = ({
   taskId,
 }): ReactElement => {
   const taskTitle = useAppSelector(state => selectTaskTitle(state, taskId));
-  const task = useAppSelector(state => selectTaskBylId(state, taskId));
+  const task = useAppSelector(state => selectTaskById(state, taskId));
   const listName = useAppSelector(state => selectListTitle(state, listId));
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'taskDatesPopper' });

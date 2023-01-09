@@ -13,15 +13,17 @@ import useResizeObserver from 'use-resize-observer';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
 import { EditableText } from 'components/EditableText/EditableText';
-import { deleteList, updateList } from 'features/lists/listsSlice';
+import { selectTasksIdsByListId, deleteList, updateList } from 'features/lists';
 import type { ListEntityAppType } from 'features/lists/types';
 import { TaskCard } from 'features/tasks/TaskCard';
-import { addTask, selectTasksByListId } from 'features/tasks/tasksSlice';
+import { addTask } from 'features/tasks/tasksSlice';
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 
-export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement => {
-  const tasks = useAppSelector(state => selectTasksByListId(state, id));
+type ListPaperPropsType = Pick<ListEntityAppType, 'title' | 'id'>;
+
+export const ListPaper = memo(({ title, id }: ListPaperPropsType): ReactElement => {
+  const tasksIds = useAppSelector(state => selectTasksIdsByListId(state, id));
 
   const [dialogOpen, setDialogOpen] = useState<boolean>(false); // use popup-state
   const [addFormActive, setAddFormActive] = useState<boolean>(false);
@@ -156,8 +158,13 @@ export const ListPaper = memo(({ title, id }: ListEntityAppType): ReactElement =
           }}
           ref={scrollbarRef}
         >
-          {tasks.map(task => (
-            <TaskCard {...task} key={task.id} onClick={handleOpenTaskDialog} />
+          {tasksIds.map(taskId => (
+            <TaskCard
+              listId={id}
+              taskId={taskId}
+              key={taskId}
+              onClick={handleOpenTaskDialog}
+            />
           ))}
           {addFormActive && (
             <AddItem

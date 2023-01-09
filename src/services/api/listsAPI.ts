@@ -3,9 +3,9 @@ import type { AxiosRequestConfig } from 'axios';
 import { baseAxiosInstance } from './axiosConfig';
 
 import {
-  normalizeGetListsResponseData,
+  normalizeListGetResponse,
   normalizeListsPostResponseData,
-} from 'services/adapters/normalizeGetListsResponseData';
+} from 'services/adapters/normalizeListGetResponse';
 import type {
   TodoListEndpointPutResponseType,
   TodoListPutModelDataType,
@@ -18,7 +18,7 @@ export const listsAPI = {
   getLists(config?: AxiosRequestConfig) {
     return baseAxiosInstance
       .get<TodoListsEndpointGetResponseType>('todo-lists', config)
-      .then(res => normalizeGetListsResponseData(res.data));
+      .then(res => normalizeListGetResponse(res.data));
   },
   createList(title: string) {
     return baseAxiosInstance

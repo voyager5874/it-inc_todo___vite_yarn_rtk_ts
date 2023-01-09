@@ -19,6 +19,7 @@ import {
   StaticDateTimePicker,
 } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import type { EntityId } from '@reduxjs/toolkit';
 import {
   add,
   addDays,
@@ -36,8 +37,8 @@ import { updateTask } from 'features/tasks/tasksSlice';
 
 type TaskDateMenuContentPropsType = {
   // task: TaskServerModelType;
-  id: string;
-  todoListId: string;
+  id: EntityId;
+  todoListId: EntityId;
   startDate: string | null;
   deadline: string | null;
   open: boolean;

@@ -13,28 +13,30 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import type { EntityId } from '@reduxjs/toolkit';
 import { useConfirm } from 'material-ui-confirm';
 import { bindContextMenu, bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import { useAppDispatch } from 'app/hooks';
-import { deleteTask } from 'features/tasks/tasksSlice';
-import type { TaskEntityAppType } from 'features/tasks/types';
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { deleteTask, selectTaskById } from 'features/tasks';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
+import { createDummyTaskObject } from 'utils';
 
-type TaskCardPropsType = TaskEntityAppType & {
+type TaskCardPropsType = {
+  listId: EntityId;
+  taskId: EntityId;
   onClick: Function;
 };
 
-export const TaskCard: FC<TaskCardPropsType> = ({
-  todoListId,
-  id,
-  title,
-  description,
-  startDate,
-  deadline,
-  onClick,
-}) => {
+export const TaskCard: FC<TaskCardPropsType> = ({ taskId, onClick }) => {
+  // const { todoListId, title, description, startDate, deadline } = useAppSelector(state =>
+  //   selectTaskById(state, taskId),
+  // );
+  const task = useAppSelector(state => selectTaskById(state, taskId));
+  const { todoListId, title, description, startDate, deadline } =
+    task || createDummyTaskObject();
+
   const [cardContentExpanded, setCardContentExpanded] = useState(false);
   const [underAction, setUnderAction] = useState(false);
 
@@ -61,7 +63,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({
 
   const cardOnLeftClick = (): void => {
     if (contextMenuControl.isOpen || calendarMenuControl.isOpen) return;
-    onClick(id);
+    onClick(taskId);
   };
 
   const cardOnRightClick = (e: MouseEvent): void => {
@@ -92,7 +94,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({
       title: 'Delete task',
       description: `Delete ${title}? This action is permanent.`,
     }).then(() => {
-      dispatch(deleteTask({ listId: todoListId, taskId: id }));
+      dispatch(deleteTask({ listId: todoListId, taskId }));
     });
     // .catch(() => contextMenuControl.close());
   };
@@ -172,7 +174,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({
         transformOrigin={{ vertical: 'center', horizontal: 'left' }}
       >
         <TaskDatesMenuContent
-          id={id}
+          id={taskId}
           todoListId={todoListId}
           startDate={startDate}
           deadline={deadline}

@@ -56,7 +56,7 @@ export const ListsPage = (): ReactElement => {
         }}
       >
         {lists.map(list => (
-          <ListPaper {...list} key={list.id} />
+          <ListPaper id={list.id} title={list.title} key={list.id} />
         ))}
         {addItemActive && (
           <AddItem

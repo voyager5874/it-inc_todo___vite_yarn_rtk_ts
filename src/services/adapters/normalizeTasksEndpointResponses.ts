@@ -34,11 +34,19 @@ const normalizeDateTimeString = (tasks: TaskServerModelType[]): TaskServerModelT
   });
 };
 
-export const normalizeGetTasksResponseData = (
+const reverseTasksOrder = (tasks: TaskServerModelType[]): TaskServerModelType[] => {
+  // return tasks.sort((a, b) => a.order - b.order);
+  return tasks.reverse();
+};
+
+export const normalizeTasksGetResponseData = (
   data: TasksEndpointGetResponseType,
 ): TasksEndpointGetResponseType => {
+  const { items } = data;
+  const orderedItems = reverseTasksOrder(items);
+
   return {
-    items: normalizeDateTimeString(data.items),
+    items: normalizeDateTimeString(orderedItems),
     error: data.error,
     totalCount: data.totalCount,
   };

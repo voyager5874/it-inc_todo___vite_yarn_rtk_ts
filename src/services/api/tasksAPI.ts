@@ -1,6 +1,7 @@
+import type { EntityId } from '@reduxjs/toolkit';
 import type { AxiosRequestConfig } from 'axios';
 
-import { normalizeGetTasksResponseData } from 'services/adapters/normalizeDateTimeString';
+import { normalizeTasksGetResponseData } from 'services/adapters/normalizeTasksEndpointResponses';
 import { baseAxiosInstance } from 'services/api/axiosConfig';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import type {
@@ -13,7 +14,7 @@ import { clearObjectEmptyData } from 'utils/clearObjectEmptyData';
 
 export const tasksAPI = {
   getTasks(
-    listId: string,
+    listId: EntityId,
     count: string | number = SERVER_MAX_TASKS_PER_REQUEST,
     page: number | string = 1,
     config?: AxiosRequestConfig,
@@ -23,9 +24,9 @@ export const tasksAPI = {
         `todo-lists/${listId}/tasks?count=${count}&page=${page}`,
         config,
       )
-      .then(res => normalizeGetTasksResponseData(res.data));
+      .then(res => normalizeTasksGetResponseData(res.data));
   },
-  createTask(listId: string, taskData: TasksEndpointPostPutModelDataType) {
+  createTask(listId: EntityId, taskData: TasksEndpointPostPutModelDataType) {
     const data = clearObjectEmptyData(taskData);
 
     return baseAxiosInstance
@@ -33,8 +34,8 @@ export const tasksAPI = {
       .then(res => res.data);
   },
   updateTask(
-    listId: string,
-    taskId: string,
+    listId: EntityId,
+    taskId: EntityId,
     taskData: TasksEndpointPostPutModelDataType,
   ) {
     const data = clearObjectEmptyData(taskData);
@@ -43,7 +44,7 @@ export const tasksAPI = {
       .put<TaskEndpointPostPutResponseType>(`todo-lists/${listId}/tasks/${taskId}`, data)
       .then(res => res.data);
   },
-  deleteTask(listId: string, taskId: string) {
+  deleteTask(listId: EntityId, taskId: EntityId) {
     return baseAxiosInstance
       .delete<TaskEndpointDeleteResponseType>(`/todo-lists/${listId}/tasks/${taskId}`)
       .then(res => res.data);

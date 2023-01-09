@@ -1,22 +1,13 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  isAnyOf,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-import type { AppThunkApiType, RootStateType } from 'app';
+import type { AppThunkApiType } from 'app';
 import { startAppListening } from 'app/listenerMiddleware';
-import {
-  addList,
-  deleteList,
-  fetchLists,
-  selectListById,
-  selectListsIds,
-} from 'features/lists';
+import { addList, deleteList, fetchLists } from 'features/lists';
+import { selectListById, selectListsIds } from 'features/lists/selectors';
+import { tasksAdapter } from 'features/tasks/normalizrAdapter';
+import { selectTaskById, selectTasksByListId } from 'features/tasks/selectors';
 import type {
   CreateTaskThunkArgType,
   FetchTasksReturnType,
@@ -25,29 +16,13 @@ import type {
 } from 'features/tasks/types';
 import { serviceLogout } from 'features/user/userSlice';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
-import { RequestResultCode, TaskPriority, TaskStatus } from 'services/api/enums';
+import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
 import type {
   TasksEndpointPostPutModelDataType,
   TaskServerModelType,
 } from 'services/api/types';
 import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
-
-const tasksAdapter = createEntityAdapter<TaskServerModelType>({
-  // selectId: task => task.todoListId,
-  sortComparer: (a, b) => a.order - b.order,
-});
-
-export const {
-  selectAll: selectAllTasks,
-  selectById: selectTaskBylId,
-  selectIds: selectTasksIds,
-} = tasksAdapter.getSelectors<RootStateType>(state => state.tasks);
-
-export const selectTasksByListId = (
-  state: RootStateType,
-  listId: string,
-): TaskServerModelType[] => state.tasks.sortedByListId[listId] || [];
 
 export const fetchTasks = createAsyncThunk<FetchTasksReturnType, string, AppThunkApiType>(
   'tasks/fetchTasks',
@@ -109,7 +84,7 @@ export const updateTask = createDataSubmitAsyncThunk(
   'tasks/updateTask',
   async (apiCallData: UpdateTaskThunkArgType, { rejectWithValue, getState }) => {
     const { listId, taskId, data } = apiCallData;
-    const currentTaskData = selectTaskBylId(getState(), taskId);
+    const currentTaskData = selectTaskById(getState(), taskId);
     let fullData: TasksEndpointPostPutModelDataType = {
       title: currentTaskData?.title || 'title',
     };
@@ -164,6 +139,9 @@ const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: [] as string[],
   fetchAttempts: 0,
+  // other objects that reference it should only store the ID rather than a copy of the entire object
+  // https://redux.js.org/faq/organizing-state
+  // SSOT I remember that
   sortedByListId: {} as Record<string, TaskServerModelType[]>,
 });
 
@@ -258,76 +236,6 @@ const tasksSlice = createSlice({
 });
 
 export const tasksReducer = tasksSlice.reducer;
-
-// export const selectGoalTasks = createSelector(
-//   [selectAllTasks, (state, goalId) => goalId],
-//   (tasks, goalId) => tasks.filter(task => task.todoListId === goalId),
-// );
-
-// Adding a separate selector function for every single field is not a good idea!
-// That ends up turning Redux into something resembling a Java class with getter/setter functions for every field.
-// It's not going to improve the code, and it's probably going to make the code worse - maintaining all those extra
-// selectors is a lot of additional effort, and it will be harder to trace what values are being used where.
-
-// output selector should always have the transformation logic
-
-export const selectTaskTitle = createSelector(selectTaskBylId, task => {
-  console.log('taskTitleSelector', task);
-  if (task) {
-    console.log('taskTitleSelector', task.title);
-
-    return task.title;
-  }
-
-  return 'selectTaskTitle: task access error';
-});
-
-export const selectTaskDescription = createSelector(selectTaskBylId, task =>
-  task ? task.description : 'selectTaskDescription: task access error',
-);
-
-export const selectTaskDeadline = createSelector(selectTaskBylId, task =>
-  task ? task.deadline : 'selectTaskDeadline: task access error',
-);
-
-export const selectTaskStartDate = createSelector(selectTaskBylId, task =>
-  task ? task.startDate : 'selectTaskStartDate: task access error',
-);
-
-export const selectTaskPriority = createSelector(selectTaskBylId, task =>
-  task ? task.priority : 'selectTaskPriority: task access error',
-);
-
-export const selectTaskStatus = createSelector(selectTaskBylId, task =>
-  task ? task.status : 'selectTaskStatus: task access error',
-);
-
-export const selectTaskParentId = createSelector(selectTaskBylId, task =>
-  task ? task.todoListId : 'selectTaskParentId: task access error',
-);
-
-export const selectCompletedTasksOfList = createSelector(selectTasksByListId, tasks =>
-  tasks.length ? tasks.filter(task => task.status === TaskStatus.Completed) : [],
-);
-
-export const selectLowPriorityTasksOfList = createSelector(selectTasksByListId, tasks =>
-  tasks.length ? tasks.filter(task => task.priority === TaskPriority.Low) : [],
-);
-
-export const selectHighPriorityTasksOfList = createSelector(selectTasksByListId, tasks =>
-  tasks.length ? tasks.filter(task => task.priority === TaskPriority.High) : [],
-);
-
-export const selectTasksOfListByPriority = createSelector(
-  selectTasksByListId,
-  (state: RootStateType, priority: TaskPriority) => priority,
-  (tasks, priority) =>
-    tasks.length ? tasks.filter(task => task.priority === priority) : [],
-);
-
-export const selectAllCompletedTasks = createSelector(selectAllTasks, tasks =>
-  tasks.length ? tasks.filter(task => task.status === TaskStatus.Completed) : [],
-);
 
 // Every time an action is dispatched, each listener will be checked to see
 // if it should run based on the current action vs the comparison option provided.

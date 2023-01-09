@@ -1,3 +1,5 @@
+import type { EntityId } from '@reduxjs/toolkit';
+
 import type {
   TasksEndpointPostPutModelDataType,
   TaskServerModelType,
@@ -25,8 +27,8 @@ export type TaskEntityAppType = TaskServerModelType;
 // };
 
 export type TaskIdentityType = {
-  listId: string;
-  taskId: string;
+  listId: EntityId;
+  taskId: EntityId;
 };
 
 export type UpdateTaskThunkArgType = TaskIdentityType & {
@@ -35,12 +37,12 @@ export type UpdateTaskThunkArgType = TaskIdentityType & {
 
 // export type CreateTaskThunkArgType = Omit<DataSubmitThunkArgType, 'taskId'>;
 export type CreateTaskThunkArgType = {
-  listId: string;
+  listId: EntityId;
   data: TasksEndpointPostPutModelDataType;
 };
 
 export type FetchTasksReturnType = {
   tasks: TaskServerModelType[];
-  listId: string;
+  listId: EntityId;
   tasksTotalCount: number;
 };

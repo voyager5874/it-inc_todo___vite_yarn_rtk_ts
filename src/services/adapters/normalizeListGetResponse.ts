@@ -6,22 +6,20 @@ import type {
   TodoListsEndpointPostResponseType,
 } from 'services/api';
 
-const addTasksTotalCountField = (list: ListServerModelType): ListEntityAppType => {
-  return { ...list, tasksTotalCount: null };
+const addFieldsToListObject = (list: ListServerModelType): ListEntityAppType => {
+  return { ...list, tasksTotalCount: null, tasks: [] };
 };
 
-const addTasksTotalCountFieldToAllTasks = (
-  lists: ListServerModelType[],
-): ListEntityAppType[] => {
+const addFieldsToAllLists = (lists: ListServerModelType[]): ListEntityAppType[] => {
   if (!lists.length) return [];
 
-  return lists.map(addTasksTotalCountField);
+  return lists.map(addFieldsToListObject);
 };
 
-export const normalizeGetListsResponseData = (
+export const normalizeListGetResponse = (
   data: TodoListsEndpointGetResponseType,
 ): ListEntityAppType[] => {
-  return addTasksTotalCountFieldToAllTasks(data);
+  return addFieldsToAllLists(data);
 };
 
 export const normalizeListsPostResponseData = (
@@ -29,6 +27,6 @@ export const normalizeListsPostResponseData = (
 ): FormSubmitResponseType<{ item: ListEntityAppType }> => {
   return {
     ...rawData,
-    data: { item: addTasksTotalCountField(rawData.data.item) },
+    data: { item: addFieldsToListObject(rawData.data.item) },
   };
 };

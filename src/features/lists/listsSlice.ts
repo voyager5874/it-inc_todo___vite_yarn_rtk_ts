@@ -1,24 +1,16 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-import type { AppThunkApiType, EntityLoadingStatusType, RootStateType } from 'app';
+import type { AppThunkApiType, EntityLoadingStatusType } from 'app';
 import { startAppListening } from 'app/listenerMiddleware';
 import { MAX_REQUEST_ATTEMPTS } from 'constants/settings';
+import { listsAdapter } from 'features/lists/normalizrAdapter';
 import type { ListEntityAppType, UpdateListThunkArgType } from 'features/lists/types';
-import { fetchTasks } from 'features/tasks/tasksSlice';
+import { addTask, fetchTasks } from 'features/tasks/tasksSlice';
 import { serviceLogout } from 'features/user/userSlice';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
 import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
-
-const listsAdapter = createEntityAdapter<ListEntityAppType>({
-  sortComparer: (a, b) => b.order - a.order,
-});
 
 export const fetchLists = createAsyncThunk<
   ListEntityAppType[],
@@ -137,8 +129,26 @@ const listsSlice = createSlice({
         listsAdapter.setAll(state, action.payload);
         console.log('fetchLists.fulfilled action.meta', action.meta);
       })
+      // .addCase(fetchTasks.fulfilled, (state, action) => {
+      //   const listId = action.meta.arg;
+      //   // const id = action.payload[0].listId;
+      //   const list = state.entities[listId];
+      //   const taskIds = action.payload.tasks.map(task => task.id);
+      //
+      //   if (list) {
+      //     list.tasks = taskIds;
+      //   }
+      // })
       .addCase(addList.fulfilled, (state, action) => {
         listsAdapter.addOne(state, action.payload);
+      })
+      .addCase(addTask.fulfilled, (state, action) => {
+        const { listId, taskData } = action.payload;
+        const list = state.entities[listId];
+
+        if (list) {
+          list.tasks.push(taskData.id);
+        }
       })
       .addCase(deleteList.fulfilled, (state, action) => {
         listsAdapter.removeOne(state, action.payload.listId);
@@ -152,27 +162,20 @@ const listsSlice = createSlice({
         return initialState;
       })
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        const { tasksTotalCount, listId } = action.payload;
+        const { tasksTotalCount } = action.payload;
+        const listId = action.meta.arg;
+        // are they sorted by 'order' field on the backend?
+        const taskIds = action.payload.tasks.map(task => task.id);
 
-        listsAdapter.updateOne(state, { id: listId, changes: { tasksTotalCount } });
+        listsAdapter.updateOne(state, {
+          id: listId,
+          changes: { tasksTotalCount, tasks: taskIds },
+        });
       });
   },
 });
 
 export const listsReducer = listsSlice.reducer;
-
-export const {
-  selectAll: selectAllLists,
-  selectById: selectListById,
-  selectIds: selectListsIds,
-} = listsAdapter.getSelectors<RootStateType>(state => state.lists);
-
-export const selectListTitle = createSelector(selectListById, list =>
-  list ? list.title : 'list access error',
-);
-
-export const selectListsFetchStatus = (state: RootStateType): EntityLoadingStatusType =>
-  state.lists.loading;
 
 startAppListening({
   predicate: action => {

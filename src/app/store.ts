@@ -5,6 +5,7 @@ import { appReducer } from './appSlice';
 import { listenerMiddleware } from 'app/listenerMiddleware';
 import { listsReducer } from 'features/lists';
 import { tasksReducer } from 'features/tasks/tasksSlice';
+import { todolistsReducer } from 'features/todolists/todolistsSlice';
 import { userReducer } from 'features/user/userSlice';
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     user: userReducer,
     lists: listsReducer,
     tasks: tasksReducer,
+    todolists: todolistsReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),
