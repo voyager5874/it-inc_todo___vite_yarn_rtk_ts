@@ -36,10 +36,11 @@ const normalizeDateTimeString = (tasks: TaskServerModelType[]): TaskServerModelT
 
 const reverseTasksOrder = (tasks: TaskServerModelType[]): TaskServerModelType[] => {
   // return tasks.sort((a, b) => a.order - b.order);
+  // it seems there is no reason to make a copy
   return tasks.reverse();
 };
 
-export const normalizeTasksGetResponseData = (
+export const transformTasksGetResponse = (
   data: TasksEndpointGetResponseType,
 ): TasksEndpointGetResponseType => {
   const { items } = data;

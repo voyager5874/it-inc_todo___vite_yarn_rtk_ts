@@ -4,7 +4,7 @@ import type { UserInAppType } from 'features/user/types';
 import { RequestResultCode } from 'services/api/enums';
 import type { LoginParamsType } from 'services/api/types';
 import { userAPI } from 'services/api/userAPI';
-import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
+import { createDataSubmitAsyncThunk } from 'utils/typedThunkCreators';
 
 export const fetchProfile = createAsyncThunk(
   'user/fetchProfile',

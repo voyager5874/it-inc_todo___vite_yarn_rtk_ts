@@ -21,6 +21,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import type { EntityId } from '@reduxjs/toolkit';
 import { isFulfilled } from '@reduxjs/toolkit';
 import { format } from 'date-fns';
 import { useFormik } from 'formik';
@@ -41,8 +42,8 @@ import { TaskStatus } from 'services/api/enums';
 type ListDialogPropsType = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  listId: string;
-  taskId: string;
+  listId: EntityId;
+  taskId: EntityId;
 };
 
 const validationSchema = yup.object({

@@ -1,3 +1,3 @@
-export { createDummyTaskObject, createDummyListOfDummyTasks } from './entitiesFactories';
+export * from './entitiesFactories';
 export { clearObjectEmptyData } from './clearObjectEmptyData';
-export { createDataSubmitAsyncThunk } from './createDataSubmitAsyncThunk';
+export { createDataSubmitAsyncThunk } from 'utils/typedThunkCreators';

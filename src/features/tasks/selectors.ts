@@ -26,11 +26,14 @@ export const {
 export const selectTasksByListId = createSelector(
   selectTasksEntities,
   (state: RootStateType, listId: EntityId) =>
-    state.lists.entities[listId]?.tasks || ['error: selectTasksByListId'],
+    state.lists.entities[listId]?.tasks || ['not a valid taskId'],
   (entities, ids) => {
     if (!ids.length) return [];
 
-    return ids.map(id => entities[id] || createDummyTaskObject());
+    return ids.map(
+      id =>
+        entities[id] || createDummyTaskObject({ title: 'error: selectTasksByListId' }),
+    );
   },
 );
 

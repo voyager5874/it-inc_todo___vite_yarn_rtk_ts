@@ -7,6 +7,8 @@ import type {
 } from 'services/api';
 
 const addFieldsToListObject = (list: ListServerModelType): ListEntityAppType => {
+  // Any references to individual items should be done by storing the item's ID
+  // https://redux.js.org/usage/structuring-reducers/normalizing-state-shape
   return { ...list, tasksTotalCount: null, tasks: [] };
 };
 
@@ -16,13 +18,13 @@ const addFieldsToAllLists = (lists: ListServerModelType[]): ListEntityAppType[] 
   return lists.map(addFieldsToListObject);
 };
 
-export const normalizeListGetResponse = (
+export const transformListGetResponse = (
   data: TodoListsEndpointGetResponseType,
 ): ListEntityAppType[] => {
   return addFieldsToAllLists(data);
 };
 
-export const normalizeListsPostResponseData = (
+export const transformListsPostResponse = (
   rawData: TodoListsEndpointPostResponseType,
 ): FormSubmitResponseType<{ item: ListEntityAppType }> => {
   return {

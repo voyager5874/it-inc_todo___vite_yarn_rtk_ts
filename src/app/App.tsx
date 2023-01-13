@@ -32,12 +32,12 @@ const router = createBrowserRouter([
       {
         path: '/login',
         element: <LoginPage />,
-        errorElement: <NotFound />,
+        // errorElement: <NotFound />,
       },
       {
         path: '/lists',
         element: <DefaultLayout />,
-        errorElement: <NotFound />,
+        // errorElement: <NotFound />,
         children: [
           {
             index: true,
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
       {
         path: '/user',
         element: <DefaultLayout />,
-        errorElement: <NotFound />,
+        // errorElement: <NotFound />,
         children: [
           {
             index: true,

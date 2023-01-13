@@ -8,6 +8,6 @@ export type ListEntityAppType = ListServerModelType & {
 };
 
 export type UpdateListThunkArgType = {
-  listId: string;
+  listId: EntityId;
   data: TodoListPutModelDataType;
 };

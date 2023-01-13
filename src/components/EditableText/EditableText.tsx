@@ -83,8 +83,10 @@ export const EditableText: FC<EditableTextPropsType> = ({ text, submitCallback }
       handleSubmit();
     }
     if (event.key === 'Escape') {
+      // prevent onBlur
       allowSubmit.current = false;
       if (textInput.current) {
+        // cancel changes
         textInput.current.value = text;
       }
       setEditMode(false);

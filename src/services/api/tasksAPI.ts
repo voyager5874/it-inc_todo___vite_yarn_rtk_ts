@@ -1,7 +1,7 @@
 import type { EntityId } from '@reduxjs/toolkit';
 import type { AxiosRequestConfig } from 'axios';
 
-import { normalizeTasksGetResponseData } from 'services/adapters/normalizeTasksEndpointResponses';
+import { transformTasksGetResponse } from 'services/adapters/tasksEndpointResponseAdapters';
 import { baseAxiosInstance } from 'services/api/axiosConfig';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import type {
@@ -24,7 +24,7 @@ export const tasksAPI = {
         `todo-lists/${listId}/tasks?count=${count}&page=${page}`,
         config,
       )
-      .then(res => normalizeTasksGetResponseData(res.data));
+      .then(res => transformTasksGetResponse(res.data));
   },
   createTask(listId: EntityId, taskData: TasksEndpointPostPutModelDataType) {
     const data = clearObjectEmptyData(taskData);

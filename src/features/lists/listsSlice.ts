@@ -1,16 +1,20 @@
+import type { EntityId } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import type { AppThunkApiType, EntityLoadingStatusType } from 'app';
 import { startAppListening } from 'app/listenerMiddleware';
+import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
 import { MAX_REQUEST_ATTEMPTS } from 'constants/settings';
 import { listsAdapter } from 'features/lists/normalizrAdapter';
+import { selectTasksIdsByListId } from 'features/lists/selectors';
 import type { ListEntityAppType, UpdateListThunkArgType } from 'features/lists/types';
-import { addTask, fetchTasks } from 'features/tasks/tasksSlice';
+import { addTask, deleteTask, fetchTasks } from 'features/tasks/tasksSlice';
 import { serviceLogout } from 'features/user/userSlice';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
-import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
+import { mutablyDeleteItemFromArray } from 'utils/deleteFromArray';
+import { createDataSubmitAsyncThunk } from 'utils/typedThunkCreators';
 
 export const fetchLists = createAsyncThunk<
   ListEntityAppType[],
@@ -60,7 +64,7 @@ export const addList = createDataSubmitAsyncThunk(
 
 export const deleteList = createDataSubmitAsyncThunk(
   'lists/deleteList',
-  async (listId: string, { rejectWithValue }) => {
+  async (listId: EntityId, { rejectWithValue, getState }) => {
     const response = await listsAPI.deleteList(listId);
 
     if (response.resultCode === RequestResultCode.Error) {
@@ -69,8 +73,9 @@ export const deleteList = createDataSubmitAsyncThunk(
         fieldsErrors: response.fieldsErrors,
       });
     }
+    const tasksIds = selectTasksIdsByListId(getState(), listId);
 
-    return { listId };
+    return { listId, tasksIds };
   },
 );
 
@@ -147,8 +152,36 @@ const listsSlice = createSlice({
         const list = state.entities[listId];
 
         if (list) {
+          mutablyDeleteItemFromArray(list.tasks, TEMPORARY_TASK_ID);
           list.tasks.push(taskData.id);
         }
+      })
+      .addCase(addTask.pending, (state, action) => {
+        const { listId } = action.meta.arg;
+
+        const list = state.entities[listId];
+
+        if (list) {
+          list.tasks.push(TEMPORARY_TASK_ID);
+        }
+      })
+      .addCase(addTask.rejected, (state, action) => {
+        const { listId } = action.meta.arg;
+
+        const list = state.entities[listId];
+
+        if (list) mutablyDeleteItemFromArray(list.tasks, TEMPORARY_TASK_ID);
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        const { listId, taskId } = action.payload;
+        const list = state.entities[listId];
+
+        if (list) mutablyDeleteItemFromArray(list.tasks, taskId);
+        // if (list) {
+        //   const idIndex = list.tasks.indexOf(taskId);
+        //
+        //   if (idIndex) list.tasks.splice(idIndex, 1);
+        // }
       })
       .addCase(deleteList.fulfilled, (state, action) => {
         listsAdapter.removeOne(state, action.payload.listId);

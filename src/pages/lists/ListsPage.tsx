@@ -7,13 +7,14 @@ import SimpleBar from 'simplebar-react';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
-import { addList, fetchLists, ListPaper, selectAllLists } from 'features/lists';
+import { addList, fetchLists, ListPaper, selectListsIds } from 'features/lists';
 
 export const ListsPage = (): ReactElement => {
   const [addItemActive, setAddItemActive] = useState(false);
 
-  const lists = useAppSelector(selectAllLists);
-
+  // const lists = useAppSelector(selectAllLists);
+  const lists = useAppSelector(selectListsIds);
+  // when change title all children will be rendered ? -> selectIds/ memo for children
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -55,8 +56,8 @@ export const ListsPage = (): ReactElement => {
           // border: '2px solid teal',
         }}
       >
-        {lists.map(list => (
-          <ListPaper id={list.id} title={list.title} key={list.id} />
+        {lists.map(listId => (
+          <ListPaper id={listId} key={listId} />
         ))}
         {addItemActive && (
           <AddItem

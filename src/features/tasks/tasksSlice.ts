@@ -4,7 +4,8 @@ import axios from 'axios';
 
 import type { AppThunkApiType } from 'app';
 import { startAppListening } from 'app/listenerMiddleware';
-import { addList, deleteList, fetchLists } from 'features/lists';
+import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
+import { deleteList, fetchLists } from 'features/lists';
 import { selectListById, selectListsIds } from 'features/lists/selectors';
 import { tasksAdapter } from 'features/tasks/normalizrAdapter';
 import { selectTaskById, selectTasksByListId } from 'features/tasks/selectors';
@@ -18,11 +19,10 @@ import { serviceLogout } from 'features/user/userSlice';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
-import type {
-  TasksEndpointPostPutModelDataType,
-  TaskServerModelType,
-} from 'services/api/types';
-import { createDataSubmitAsyncThunk } from 'utils/createDataSubmitAsyncThunk';
+import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
+import { createDummyTaskObject } from 'utils';
+import { mutablyDeleteItemFromArray } from 'utils/deleteFromArray';
+import { createDataSubmitAsyncThunk } from 'utils/typedThunkCreators';
 
 export const fetchTasks = createAsyncThunk<FetchTasksReturnType, string, AppThunkApiType>(
   'tasks/fetchTasks',
@@ -139,10 +139,6 @@ const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: [] as string[],
   fetchAttempts: 0,
-  // other objects that reference it should only store the ID rather than a copy of the entire object
-  // https://redux.js.org/faq/organizing-state
-  // SSOT I remember that
-  sortedByListId: {} as Record<string, TaskServerModelType[]>,
 });
 
 const tasksSlice = createSlice({
@@ -163,11 +159,9 @@ const tasksSlice = createSlice({
     //   state.loading.push(action.payload.listId);
     // },
     fetchTasksOfListRequestEnded: (state, action: PayloadAction<{ listId: string }>) => {
-      const idIndex = state.loading.indexOf(action.payload.listId);
+      const { listId } = action.payload;
 
-      if (idIndex !== -1) {
-        state.loading.splice(idIndex, 1);
-      }
+      mutablyDeleteItemFromArray(state.loading, listId);
     },
   },
   extraReducers: builder => {
@@ -176,61 +170,65 @@ const tasksSlice = createSlice({
         const { tasks } = action.payload;
 
         tasksAdapter.setMany(state, tasks);
-        state.sortedByListId[action.payload.listId] = tasks;
       })
       .addCase(fetchTasks.pending, (state, action) => {
         state.loading.push(action.meta.arg);
       })
       .addCase(addTask.fulfilled, (state, action) => {
-        const { listId, taskData } = action.payload;
+        const { taskData } = action.payload;
 
+        tasksAdapter.removeOne(state, TEMPORARY_TASK_ID);
         tasksAdapter.addOne(state, taskData);
-        state.sortedByListId[listId].push(taskData);
+      })
+      .addCase(addTask.pending, (state, action) => {
+        const { data, listId } = action.meta.arg;
+
+        tasksAdapter.addOne(
+          state,
+          createDummyTaskObject({
+            ...data,
+            id: TEMPORARY_TASK_ID,
+            todoListId: listId as string,
+            description: null,
+          }),
+        );
+      })
+      .addCase(addTask.rejected, state => {
+        tasksAdapter.removeOne(state, TEMPORARY_TASK_ID);
       })
       .addCase(updateTask.fulfilled, (state, action) => {
-        const { listId, taskData } = action.payload;
+        const { taskData } = action.payload;
         const taskId = taskData.id;
 
         tasksAdapter.updateOne(state, { id: taskId, changes: taskData });
-        const taskToUpdate = state.sortedByListId[listId].find(
-          task => task.id === taskId,
-        );
-
-        if (taskToUpdate) {
-          Object.assign(taskToUpdate, taskData);
-        }
       })
-      .addCase(addList.fulfilled, (state, action) => {
-        const { id } = action.payload;
-
-        state.sortedByListId[id] = [];
-      })
+      // .addCase(addList.fulfilled, (state, action) => {
+      //   const { id } = action.payload;
+      //
+      //   state.sortedByListId[id] = [];
+      // })
       .addCase(deleteList.fulfilled, (state, action) => {
-        const tasksIds = state.sortedByListId[action.payload.listId].map(task => task.id);
+        // const tasksIds = state.sortedByListId[action.payload.listId].map(task => task.id);
+        const { tasksIds } = action.payload;
 
         tasksAdapter.removeMany(state, tasksIds);
-        delete state.sortedByListId[action.payload.listId];
+        // delete state.sortedByListId[action.payload.listId];
       })
       .addCase(deleteTask.fulfilled, (state, action) => {
-        const { listId, taskId } = action.payload;
+        const { taskId } = action.payload;
 
         tasksAdapter.removeOne(state, taskId);
-        const taskIndex = state.sortedByListId[listId].findIndex(
-          task => task.id === taskId,
-        );
-
-        if (taskIndex !== -1) {
-          state.sortedByListId[listId].splice(taskIndex, 1);
-        }
       })
       .addCase(serviceLogout.fulfilled, () => initialState)
       .addMatcher(isAnyOf(fetchTasks.rejected, fetchTasks.fulfilled), (state, action) => {
         const listId = action.meta.arg;
-        const idIndex = state.loading.indexOf(listId);
 
-        if (idIndex !== -1) {
-          state.loading.splice(idIndex, 1);
-        }
+        // const idIndex = state.loading.indexOf(listId);
+        //
+        // if (idIndex !== -1) {
+        //   state.loading.splice(idIndex, 1);
+        // }
+        mutablyDeleteItemFromArray(state.loading, listId);
       });
   },
 });

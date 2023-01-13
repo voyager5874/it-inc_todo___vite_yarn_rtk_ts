@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Add, Style } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, IconButton, List, Menu, MenuItem, Paper } from '@mui/material';
+import type { EntityId } from '@reduxjs/toolkit';
 import { useConfirm } from 'material-ui-confirm';
 import { bindMenu, bindToggle } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -13,16 +14,28 @@ import useResizeObserver from 'use-resize-observer';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
 import { EditableText } from 'components/EditableText/EditableText';
-import { selectTasksIdsByListId, deleteList, updateList } from 'features/lists';
-import type { ListEntityAppType } from 'features/lists/types';
+import {
+  deleteList,
+  selectListById,
+  selectTasksIdsByListId,
+  updateList,
+} from 'features/lists';
 import { TaskCard } from 'features/tasks/TaskCard';
 import { addTask } from 'features/tasks/tasksSlice';
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
+import { createDummyListObject } from 'utils';
 
-type ListPaperPropsType = Pick<ListEntityAppType, 'title' | 'id'>;
+// type ListPaperPropsType = Pick<ListEntityAppType, 'title' | 'id'>;
+type ListPaperPropsType = {
+  id: EntityId;
+};
 
-export const ListPaper = memo(({ title, id }: ListPaperPropsType): ReactElement => {
+export const ListPaper = memo(({ id }: ListPaperPropsType): ReactElement => {
+  const { title } =
+    useAppSelector(state => selectListById(state, id)) ||
+    createDummyListObject({ title: 'error/ListPaper/selectListById' });
+
   const tasksIds = useAppSelector(state => selectTasksIdsByListId(state, id));
 
   const [dialogOpen, setDialogOpen] = useState<boolean>(false); // use popup-state
@@ -46,7 +59,7 @@ export const ListPaper = memo(({ title, id }: ListPaperPropsType): ReactElement 
   // useEffect(() => {
   //   // If this was a separate page for a given list, then canceling the request would be crucial
   //   // without cleanup, going to other list page would cause two or more requests running, any of
-  //   // which could be last settled and hence displayed
+  //   // which could be last settled and hence displayed aka 'race condition'
   //   // dispatch(fetchTasks(id));
   //   const thunk = dispatch(fetchTasks(id));
   //
