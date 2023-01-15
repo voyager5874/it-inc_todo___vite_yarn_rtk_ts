@@ -1,15 +1,22 @@
 import type { ChangeEvent, FC, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import type { TypographyProps } from '@mui/material';
 import { OutlinedInput, Typography } from '@mui/material';
 
-type EditableTextPropsType = {
+type EditableTextPropsType = TypographyProps & {
   text: string;
   submitCallback: (newText: string) => Promise<any>;
+  // variant?: TypographyVariant;
   // reference: Ref<any>;
 };
 
-export const EditableText: FC<EditableTextPropsType> = ({ text, submitCallback }) => {
+export const EditableText: FC<EditableTextPropsType> = ({
+  text,
+  variant = 'h6',
+  submitCallback,
+  ...restProps
+}) => {
   const [editMode, setEditMode] = useState<boolean>(false);
 
   // The only validation needed here is length, I'll show server error message and
@@ -97,7 +104,7 @@ export const EditableText: FC<EditableTextPropsType> = ({ text, submitCallback }
     <>
       <Typography
         onClick={activateEditMode}
-        variant="h6"
+        variant={variant}
         sx={{
           zIndex: '10',
           wordBreak: 'break-word',
@@ -106,6 +113,7 @@ export const EditableText: FC<EditableTextPropsType> = ({ text, submitCallback }
           margin: 0,
           display: !editMode ? 'block' : 'none',
         }}
+        {...restProps}
       >
         {textInput?.current?.value || text}
       </Typography>

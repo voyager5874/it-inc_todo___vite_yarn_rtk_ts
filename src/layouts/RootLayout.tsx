@@ -6,7 +6,7 @@ import { Alert, Box, Snackbar } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { resetAppEvents } from 'app/appSlice';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 
 export const RootLayout = (): ReactElement => {
   const error = useAppSelector(state => state.app.error);

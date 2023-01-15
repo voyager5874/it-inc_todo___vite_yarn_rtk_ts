@@ -22,8 +22,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { NavLink, Outlet } from 'react-router-dom';
 
 import { ColorModeContext } from 'app/App';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { serviceLogout } from 'features/user/userSlice';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 
 export const DefaultLayout = (): ReactElement => {
   const avatar = useAppSelector(state => state.user.photoLarge);

@@ -18,9 +18,9 @@ import { useConfirm } from 'material-ui-confirm';
 import { bindContextMenu, bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
 import { deleteTask, selectTaskById } from 'features/tasks';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
 import { createDummyTaskObject } from 'utils';
 
@@ -64,7 +64,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({ taskId, onClick }) => {
 
   const cardOnLeftClick = (): void => {
     // user potentially could add another task if the connection is really slow
-    if (taskId === TEMPORARY_TASK_ID) return;
+    if (String(taskId).includes(TEMPORARY_TASK_ID)) return;
     if (contextMenuControl.isOpen || calendarMenuControl.isOpen) return;
     onClick(taskId);
   };

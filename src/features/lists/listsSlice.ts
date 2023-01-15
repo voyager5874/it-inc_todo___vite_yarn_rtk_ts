@@ -3,7 +3,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import type { AppThunkApiType, EntityLoadingStatusType } from 'app';
-import { startAppListening } from 'app/listenerMiddleware';
 import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
 import { MAX_REQUEST_ATTEMPTS } from 'constants/settings';
 import { listsAdapter } from 'features/lists/normalizrAdapter';
@@ -11,6 +10,7 @@ import { selectTasksIdsByListId } from 'features/lists/selectors';
 import type { ListEntityAppType, UpdateListThunkArgType } from 'features/lists/types';
 import { addTask, deleteTask, fetchTasks } from 'features/tasks/tasksSlice';
 import { serviceLogout } from 'features/user/userSlice';
+import { startAppListening } from 'middlewares/listenerMiddleware';
 import { RequestResultCode } from 'services/api/enums';
 import { listsAPI } from 'services/api/listsAPI';
 import { mutablyDeleteItemFromArray } from 'utils/deleteFromArray';
@@ -152,25 +152,25 @@ const listsSlice = createSlice({
         const list = state.entities[listId];
 
         if (list) {
-          mutablyDeleteItemFromArray(list.tasks, TEMPORARY_TASK_ID);
+          mutablyDeleteItemFromArray(list.tasks, TEMPORARY_TASK_ID + taskData.title);
           list.tasks.push(taskData.id);
         }
       })
       .addCase(addTask.pending, (state, action) => {
-        const { listId } = action.meta.arg;
+        const { listId, data } = action.meta.arg;
 
         const list = state.entities[listId];
 
         if (list) {
-          list.tasks.push(TEMPORARY_TASK_ID);
+          list.tasks.push(TEMPORARY_TASK_ID + data.title);
         }
       })
       .addCase(addTask.rejected, (state, action) => {
-        const { listId } = action.meta.arg;
+        const { listId, data } = action.meta.arg;
 
         const list = state.entities[listId];
 
-        if (list) mutablyDeleteItemFromArray(list.tasks, TEMPORARY_TASK_ID);
+        if (list) mutablyDeleteItemFromArray(list.tasks, TEMPORARY_TASK_ID + data.title);
       })
       .addCase(deleteTask.fulfilled, (state, action) => {
         const { listId, taskId } = action.payload;

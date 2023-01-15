@@ -10,8 +10,8 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import type { DateRange } from 'mui-daterange-picker';
 import { DateRangePicker } from 'mui-daterange-picker';
 
-import { useAppDispatch } from 'app/hooks';
 import { updateTask } from 'features/tasks/tasksSlice';
+import { useAppDispatch } from 'hooks/redux';
 import type { TaskServerModelType } from 'services/api/types';
 
 type TaskDateMenuPropsType = {
@@ -74,7 +74,7 @@ export const TaskDatesMenu: FC<TaskDateMenuPropsType> = ({ task }) => {
     );
   };
 
-  const resetDates = () => {
+  const resetDates = (): void => {
     setPickedStartDate(null);
     setPickedDeadline(null);
   };

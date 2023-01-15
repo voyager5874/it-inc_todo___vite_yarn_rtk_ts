@@ -8,13 +8,14 @@ import {
   createTheme,
   CssBaseline,
   ThemeProvider,
+  Typography,
   useMediaQuery,
 } from '@mui/material';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import { selectAppInitializationStatus } from 'app/appSlice';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { authenticateUser } from 'features/user/userSlice';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { RootLayout } from 'layouts';
 import { DefaultLayout } from 'layouts/DefaultLayout';
 import { NotFound } from 'pages';
@@ -99,8 +100,9 @@ export const App = (): ReactElement => {
 
   if (!appIsInitialized) {
     return (
-      <Box sx={{ position: 'fixed', top: '30%', textAlign: 'center', width: '100%' }}>
-        <CircularProgress size="10vw" />
+      <Box sx={{ position: 'fixed', top: '40%', textAlign: 'center', width: '100%' }}>
+        <CircularProgress size="10vw" sx={{ marginBottom: '30px' }} />
+        <Typography variant="h5">Initialization...</Typography>
       </Box>
     );
   }

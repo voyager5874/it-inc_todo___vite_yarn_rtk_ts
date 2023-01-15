@@ -32,8 +32,9 @@ import {
 import type { DateRange } from 'mui-daterange-picker';
 import { DateRangePicker } from 'mui-daterange-picker';
 
-import { useAppDispatch } from 'app/hooks';
+import { YEARS_RANGE } from 'constants/settings';
 import { updateTask } from 'features/tasks/tasksSlice';
+import { useAppDispatch } from 'hooks/redux';
 
 type TaskDateMenuContentPropsType = {
   // task: TaskServerModelType;
@@ -199,8 +200,8 @@ export const TaskDatesMenuContent: FC<TaskDateMenuContentPropsType> = ({
               onChange={handleTimeRangeChange}
               toggle={() => {}}
               definedRanges={[]}
-              maxDate={addYears(new Date(), 3)}
-              minDate={subYears(new Date(), 3)}
+              maxDate={addYears(new Date(), YEARS_RANGE)}
+              minDate={subYears(new Date(), YEARS_RANGE)}
             />
             <Box sx={{ mt: 2 }}>
               <DesktopTimePicker

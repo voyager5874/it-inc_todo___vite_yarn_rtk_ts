@@ -2,11 +2,11 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { appReducer } from './appSlice';
 
-import { listenerMiddleware } from 'app/listenerMiddleware';
 import { listsReducer } from 'features/lists';
 import { tasksReducer } from 'features/tasks/tasksSlice';
 import { todolistsReducer } from 'features/todolists/todolistsSlice';
 import { userReducer } from 'features/user/userSlice';
+import { listenerMiddleware } from 'middlewares/listenerMiddleware';
 
 export const store = configureStore({
   reducer: {

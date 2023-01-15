@@ -3,7 +3,6 @@ import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import type { AppThunkApiType } from 'app';
-import { startAppListening } from 'app/listenerMiddleware';
 import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
 import { deleteList, fetchLists } from 'features/lists';
 import { selectListById, selectListsIds } from 'features/lists/selectors';
@@ -16,6 +15,7 @@ import type {
   UpdateTaskThunkArgType,
 } from 'features/tasks/types';
 import { serviceLogout } from 'features/user/userSlice';
+import { startAppListening } from 'middlewares/listenerMiddleware';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
@@ -177,7 +177,7 @@ const tasksSlice = createSlice({
       .addCase(addTask.fulfilled, (state, action) => {
         const { taskData } = action.payload;
 
-        tasksAdapter.removeOne(state, TEMPORARY_TASK_ID);
+        tasksAdapter.removeOne(state, TEMPORARY_TASK_ID + taskData.title);
         tasksAdapter.addOne(state, taskData);
       })
       .addCase(addTask.pending, (state, action) => {
@@ -187,14 +187,16 @@ const tasksSlice = createSlice({
           state,
           createDummyTaskObject({
             ...data,
-            id: TEMPORARY_TASK_ID,
+            id: TEMPORARY_TASK_ID + data.title,
             todoListId: listId as string,
             description: null,
           }),
         );
       })
-      .addCase(addTask.rejected, state => {
-        tasksAdapter.removeOne(state, TEMPORARY_TASK_ID);
+      .addCase(addTask.rejected, (state, action) => {
+        const { data } = action.meta.arg;
+
+        tasksAdapter.removeOne(state, TEMPORARY_TASK_ID + data.title);
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         const { taskData } = action.payload;

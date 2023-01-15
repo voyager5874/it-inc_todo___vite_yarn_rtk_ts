@@ -49,6 +49,9 @@ export const selectTasksByListIdSortedByTitle = createSelector(
   },
 );
 
+export const selectTasksLoadingStatus = (state: RootStateType): number =>
+  state.tasks.loading.length;
+
 // export const selectGoalTasks = createSelector(
 //   [selectAllTasks, (state, goalId) => goalId],
 //   (tasks, goalId) => tasks.filter(task => task.todoListId === goalId),

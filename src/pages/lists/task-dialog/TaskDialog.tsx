@@ -29,9 +29,9 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
 import * as yup from 'yup';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { selectListTitle } from 'features/lists';
 import { selectTaskById, selectTaskTitle, updateTask } from 'features/tasks';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
 import {
   SERVER_ENTITY_MAX_TITLE_LENGTH,

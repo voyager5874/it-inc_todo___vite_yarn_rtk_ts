@@ -11,7 +11,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import SimpleBar from 'simplebar-react';
 import useResizeObserver from 'use-resize-observer';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
 import { EditableText } from 'components/EditableText/EditableText';
 import {
@@ -22,6 +21,7 @@ import {
 } from 'features/lists';
 import { TaskCard } from 'features/tasks/TaskCard';
 import { addTask } from 'features/tasks/tasksSlice';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 import { createDummyListObject } from 'utils';

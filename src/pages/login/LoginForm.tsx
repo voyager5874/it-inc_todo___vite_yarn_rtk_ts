@@ -16,8 +16,8 @@ import { isRejectedWithValue } from '@reduxjs/toolkit';
 import { useFormik } from 'formik';
 
 // import * as yup from 'yup';
-import { useAppDispatch } from 'app/hooks';
 import { serviceLogin } from 'features/user/userSlice';
+import { useAppDispatch } from 'hooks/redux';
 import type { LoginParamsType } from 'services/api/types';
 
 // const validationSchema = yup.object({

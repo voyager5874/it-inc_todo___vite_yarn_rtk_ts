@@ -8,11 +8,11 @@ import {
 import axios from 'axios';
 
 import type { AppThunkApiType, EntityLoadingStatusType, RootStateType } from 'app';
-import { startAppListening } from 'app/listenerMiddleware';
 import { MAX_REQUEST_ATTEMPTS } from 'constants/settings';
 import type { ListEntityAppType } from 'features/lists/types';
 import type { CreateTaskThunkArgType } from 'features/tasks/types';
 import type { TodolistEntryType } from 'features/todolists/types';
+import { startAppListening } from 'middlewares/listenerMiddleware';
 import type { TaskServerModelType } from 'services/api';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import { RequestResultCode } from 'services/api/enums';

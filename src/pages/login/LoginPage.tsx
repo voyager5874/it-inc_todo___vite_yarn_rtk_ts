@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Box, Link, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { useAppSelector } from 'app/hooks';
+import { useAppSelector } from 'hooks/redux';
 import { LoginForm } from 'pages/login/LoginForm';
 
 export const LoginPage = (): ReactElement => {

@@ -2,12 +2,13 @@ import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 
 import { Add } from '@mui/icons-material';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { AddItem } from 'components/AddItem/AddItem';
 import { addList, fetchLists, ListPaper, selectListsIds } from 'features/lists';
+import { selectTasksLoadingStatus } from 'features/tasks';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 
 export const ListsPage = (): ReactElement => {
   const [addItemActive, setAddItemActive] = useState(false);
@@ -15,6 +16,8 @@ export const ListsPage = (): ReactElement => {
   // const lists = useAppSelector(selectAllLists);
   const lists = useAppSelector(selectListsIds);
   // when change title all children will be rendered ? -> selectIds/ memo for children
+  const loading = useAppSelector(selectTasksLoadingStatus);
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -33,6 +36,22 @@ export const ListsPage = (): ReactElement => {
   const toggleAddItemActive = (): void => {
     setAddItemActive(prev => !prev);
   };
+
+  if (loading) {
+    return (
+      <Container
+        sx={{
+          // backgroundColor: 'red',
+          minHeight: '90vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h4">Loading data...</Typography>
+      </Container>
+    );
+  }
 
   return (
     <SimpleBar
