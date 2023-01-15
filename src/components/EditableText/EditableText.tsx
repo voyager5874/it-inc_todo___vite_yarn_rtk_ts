@@ -41,6 +41,8 @@ export const EditableText: FC<EditableTextPropsType> = ({
   //   }
   // };
 
+  // this component currently violates flux flow principle ?
+  // changed name was displayed even though I tried to set empty object resulting from put request
   const handleSubmit = (): void => {
     if (!allowSubmit.current) return;
     setEditMode(false); // 'optimistic UI' -> need to temporally set newText but revert it if request rejected
@@ -105,6 +107,7 @@ export const EditableText: FC<EditableTextPropsType> = ({
       <Typography
         onClick={activateEditMode}
         variant={variant}
+        {...restProps}
         sx={{
           zIndex: '10',
           wordBreak: 'break-word',
@@ -113,7 +116,6 @@ export const EditableText: FC<EditableTextPropsType> = ({
           margin: 0,
           display: !editMode ? 'block' : 'none',
         }}
-        {...restProps}
       >
         {textInput?.current?.value || text}
       </Typography>
@@ -126,6 +128,7 @@ export const EditableText: FC<EditableTextPropsType> = ({
         maxRows={5}
         autoFocus
         sx={{
+          fontSize: '1.5em',
           margin: '0px',
           padding: '0',
           display: editMode ? 'block' : 'none',

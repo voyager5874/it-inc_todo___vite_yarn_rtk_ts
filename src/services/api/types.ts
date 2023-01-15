@@ -16,24 +16,31 @@ export type LoginParamsType = {
 export type ProfileServerModelType = {
   aboutMe: string;
   contacts: {
-    facebook: string;
-    website: string;
-    vk: string;
-    twitter: string;
-    instagram: string;
-    youtube: string;
-    github: string;
-    mainLink: string;
+    facebook: string | null;
+    website: string | null;
+    vk: string | null;
+    twitter: string | null;
+    instagram: string | null;
+    youtube: string | null;
+    github: string | null;
+    mainLink: string | null;
   };
   lookingForAJob: boolean;
   lookingForAJobDescription: string;
   fullName: string;
   userId: number;
   photos: {
-    small: string;
-    large: string;
+    small: string | null;
+    large: string | null;
   };
 };
+
+export type ProfileEndpointPutDataType = {
+  fullName: string;
+  userId: number | string;
+  aboutMe: string;
+  lookingForAJobDescription: string;
+} & Partial<ProfileServerModelType>;
 
 export type FormFieldErrorType = { field: string; error: string };
 

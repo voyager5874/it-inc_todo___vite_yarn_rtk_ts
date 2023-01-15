@@ -13,12 +13,14 @@ import {
 } from '@mui/material';
 
 import { EditableText } from 'components/EditableText/EditableText';
-import { serviceLogout } from 'features/user/userSlice';
+import { changeUserName, serviceLogout } from 'features/user/userSlice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 
 export const UserCard = (): ReactElement => {
   const avatar = useAppSelector(state => state.user.photoLarge);
   const name = useAppSelector(state => state.user.name);
+  const email = useAppSelector(state => state.user.email);
+  const about = useAppSelector(state => state.user.about);
 
   const dispatch = useAppDispatch();
 
@@ -26,16 +28,19 @@ export const UserCard = (): ReactElement => {
     dispatch(serviceLogout());
   };
   const handleChangeName = (newName: string): Promise<any> => {
-    // return dispatch(updateUserData({})).unwrap();
-    return new Promise(res => {
-      setTimeout(() => res(newName), 1000);
-    });
+    return dispatch(changeUserName(newName)).unwrap();
+    // return new Promise(res => {
+    //   setTimeout(() => res(newName), 1000);
+    // });
   };
 
   return (
     <Card
+      elevation={10}
       sx={{
-        maxWidth: '400px',
+        borderRadius: '5px',
+        minWidth: '350px',
+        maxWidth: '450px',
         minHeight: '400px',
         position: 'relative',
         display: 'flex',
@@ -51,7 +56,7 @@ export const UserCard = (): ReactElement => {
           image="https://www.codingem.com/wp-content/uploads/2021/10/juanjo-jaramillo-mZnx9429i94-unsplash-2048x1365.jpg?ezimgfmt=ng%3Awebp%2Fngcb1%2Frs%3Adevice%2Frscb1-2"
         />
         <Avatar
-          src={avatar}
+          src={avatar || undefined}
           sx={{
             position: 'absolute',
             bottom: '0px',
@@ -66,25 +71,23 @@ export const UserCard = (): ReactElement => {
         </Avatar>
       </Box>
 
-      <CardContent>
+      <CardContent sx={{ padding: '20px 20px 0 20px' }}>
         <EditableText
           text={name}
           submitCallback={handleChangeName}
           variant="h5"
-          sx={{ marginBottom: '20px' }}
+          // style={{ marginBottom: '20px' }}
         />
-        {/* <Typography gutterBottom variant="h5" component="div"> */}
-        {/*  {name} */}
-        {/* </Typography> */}
-        <Typography variant="body2" color="text.secondary">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-          nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-          fugiat nulla pariatur
+        <Typography variant="caption" color="text.secondary">
+          {email}
         </Typography>
+        {about && (
+          <Typography variant="body1" color="text.secondary" sx={{ marginTop: '20px' }}>
+            {about}
+          </Typography>
+        )}
       </CardContent>
-      <CardActions>
+      <CardActions sx={{ padding: '20px' }}>
         <Button size="small" onClick={handleLogout}>
           Logout
         </Button>

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import type { UserInAppType } from 'features/user/types';
 import { RequestResultCode } from 'services/api/enums';
-import type { LoginParamsType } from 'services/api/types';
+import type { LoginParamsType, ProfileServerModelType } from 'services/api/types';
 import { userAPI } from 'services/api/userAPI';
 import { createDataSubmitAsyncThunk } from 'utils/typedThunkCreators';
 
@@ -10,6 +10,25 @@ export const fetchProfile = createAsyncThunk(
   'user/fetchProfile',
   async (id: number | string) => {
     return userAPI.fetchProfile(id);
+  },
+);
+
+export const changeUserName = createDataSubmitAsyncThunk(
+  'user/changeName',
+  async (name: string, { rejectWithValue, getState }) => {
+    const userData = getState().user.allUserData;
+    const response = await userAPI.updateUserData({ ...userData, fullName: name });
+
+    if (response.resultCode === RequestResultCode.Error) {
+      return rejectWithValue({
+        messages: response.messages,
+        fieldsErrors: response.fieldsErrors,
+      });
+    }
+
+    // server returns no data on success
+    // return response.data;
+    return { ...userData, fullName: name };
   },
 );
 
@@ -67,9 +86,11 @@ const initialState: UserInAppType = {
   id: null,
   login: '',
   name: '',
+  about: '',
   email: '',
   photoLarge: '',
   auth: false,
+  allUserData: {} as ProfileServerModelType,
 };
 
 const userSlice = createSlice({
@@ -87,8 +108,17 @@ const userSlice = createSlice({
         state.auth = true;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
-        state.name = action.payload.fullName;
-        state.photoLarge = action.payload.photos.large;
+        const { fullName, photos, aboutMe } = action.payload;
+
+        state.allUserData = action.payload;
+        state.name = fullName;
+        state.about = aboutMe;
+        state.photoLarge = photos.large;
+      })
+      .addCase(changeUserName.fulfilled, (state, action) => {
+        const { fullName } = action.payload;
+
+        state.name = fullName;
       })
       .addCase(serviceLogout.fulfilled, () => {
         return initialState;

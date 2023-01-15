@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { useContext } from 'react';
 
-import { AccountCircle, DarkMode, Logout, Settings } from '@mui/icons-material';
+import { AccountCircle, DarkMode, Logout, Person, Settings } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
@@ -72,7 +72,7 @@ export const DefaultLayout = (): ReactElement => {
               aria-haspopup="true"
               color="inherit"
             >
-              <Avatar src={avatar} alt="avatar">
+              <Avatar src={avatar || undefined} alt="avatar">
                 <AccountCircle />
               </Avatar>
             </IconButton>
@@ -112,7 +112,10 @@ export const DefaultLayout = (): ReactElement => {
                 to="/user"
                 onMouseUp={accountMenuControl.close}
               >
-                <Avatar /> Profile
+                <ListItemIcon>
+                  <Person fontSize="small" />
+                </ListItemIcon>
+                Profile
               </MenuItem>
               <Divider />
               <MenuItem>

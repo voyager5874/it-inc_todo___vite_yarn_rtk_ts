@@ -1,11 +1,12 @@
 import { baseAxiosInstance, extrasAxiosInstance } from './axiosConfig';
 
 import type {
-  ProfileServerModelType,
   FormSubmitResponseType,
-  UserAccountType,
   LoginParamsType,
+  ProfileEndpointPutDataType,
+  ProfileServerModelType,
   PutAvatarResponseType,
+  UserAccountType,
 } from 'services/api/types';
 
 export const userAPI = {
@@ -53,4 +54,8 @@ export const userAPI = {
       formData,
     );
   },
+  updateUserData: (userData: ProfileEndpointPutDataType) =>
+    extrasAxiosInstance
+      .put<FormSubmitResponseType<ProfileServerModelType>>('profile', userData)
+      .then(res => res.data),
 };
