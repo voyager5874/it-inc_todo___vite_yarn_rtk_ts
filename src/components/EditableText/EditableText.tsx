@@ -2,10 +2,12 @@ import type { ChangeEvent, FC, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { TypographyProps } from '@mui/material';
-import { OutlinedInput, Typography } from '@mui/material';
+import { Button, TextField, Typography } from '@mui/material';
 
 type EditableTextPropsType = TypographyProps & {
   text: string;
+  defaultText?: string;
+  maxInputRows?: number;
   submitCallback: (newText: string) => Promise<any>;
   // variant?: TypographyVariant;
   // reference: Ref<any>;
@@ -13,7 +15,9 @@ type EditableTextPropsType = TypographyProps & {
 
 export const EditableText: FC<EditableTextPropsType> = ({
   text,
+  defaultText,
   variant = 'h6',
+  maxInputRows = 5,
   submitCallback,
   ...restProps
 }) => {
@@ -85,9 +89,7 @@ export const EditableText: FC<EditableTextPropsType> = ({
     }
   };
 
-  const handleKeyboardFormControl = (
-    event: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
-  ): void => {
+  const handleKeyboardFormControl = (event: KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === 'Enter') {
       handleSubmit();
     }
@@ -104,28 +106,45 @@ export const EditableText: FC<EditableTextPropsType> = ({
 
   return (
     <>
-      <Typography
-        onClick={activateEditMode}
-        variant={variant}
-        {...restProps}
+      <Button
+        fullWidth
+        variant="text"
         sx={{
-          zIndex: '10',
-          wordBreak: 'break-word',
-          cursor: 'pointer',
+          color: theme => theme.palette.text.primary,
+          textAlign: 'left',
+          textTransform: 'none',
+          zIndex: '11',
           padding: 0,
           margin: 0,
           display: !editMode ? 'block' : 'none',
         }}
       >
-        {textInput?.current?.value || text}
-      </Typography>
-      <OutlinedInput
+        <Typography
+          onClick={activateEditMode}
+          variant={variant}
+          {...restProps}
+          sx={{
+            zIndex: '10',
+            wordBreak: 'break-word',
+            cursor: 'pointer',
+            padding: 0,
+            margin: 0,
+            display: !editMode ? 'block' : 'none',
+          }}
+        >
+          {textInput?.current?.value || text || defaultText}
+        </Typography>
+      </Button>
+
+      <TextField
+        variant="outlined"
         defaultValue={text}
+        placeholder={defaultText}
         inputRef={textInput}
         fullWidth
         onKeyDown={handleKeyboardFormControl}
         multiline
-        maxRows={5}
+        maxRows={maxInputRows}
         autoFocus
         sx={{
           fontSize: '1.5em',

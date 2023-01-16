@@ -68,7 +68,7 @@ const validationSchema = yup.object({
 //   status: 0,
 // };
 
-export const TaskDialog: FC<ListDialogPropsType> = ({
+export const TaskDialogBackup: FC<ListDialogPropsType> = ({
   open,
   setOpen,
   listId,

@@ -22,7 +22,7 @@ import {
 import { TaskCard } from 'features/tasks/TaskCard';
 import { addTask } from 'features/tasks/tasksSlice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
-import { TaskDialog } from 'pages/lists/task-dialog/TaskDialog';
+import { TaskEditDialog } from 'pages/lists/task-dialog/TaskEditDialog';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 import { createDummyListObject } from 'utils';
 
@@ -220,7 +220,7 @@ export const ListPaper = memo(({ id }: ListPaperPropsType): ReactElement => {
           <Style />
         </IconButton>
       </Box>
-      <TaskDialog
+      <TaskEditDialog
         open={dialogOpen && Boolean(selectedTaskId.current)}
         setOpen={setDialogOpen}
         listId={id}
