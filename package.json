@@ -1,12 +1,15 @@
 {
   "name": "it-inc_todo___vite_yarn_rtk_ts",
+  "homepage": "https://voyager5874.github.io/it-inc_todo___vite_yarn_rtk_ts/",
   "private": false,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d dist",
+    "preview": "vite preview --port 3000",
     "prepare": "husky install",
     "lint-fix": "eslint --fix",
     "postinstall": "patch-package"
@@ -31,6 +34,7 @@
     "date-fns": "^2.29.3",
     "date-fns-tz": "^1.3.7",
     "formik": "^2.2.9",
+    "gh-pages": "^4.0.0",
     "material-ui-confirm": "^3.0.7",
     "material-ui-popup-state": "^5.0.4",
     "mui-daterange-picker": "^1.0.5",

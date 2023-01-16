@@ -11,4 +11,5 @@ export default defineConfig({
     port: 3000,
   },
   plugins: [react(), tsconfigPaths()],
+  base: '/it-inc_todo___vite_yarn_rtk_ts/',
 });

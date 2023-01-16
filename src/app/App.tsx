@@ -11,7 +11,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { createHashRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import { selectAppInitializationStatus } from 'app/appSlice';
 import { authenticateUser } from 'features/user/userSlice';
@@ -23,7 +23,7 @@ import { ListsPage } from 'pages/lists/ListsPage';
 import { LoginPage } from 'pages/login/LoginPage';
 import { UserPage } from 'pages/user/UserPage';
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <RootLayout />,
