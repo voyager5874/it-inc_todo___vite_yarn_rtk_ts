@@ -1,12 +1,6 @@
 import type { FC, ReactElement } from 'react';
 
-import {
-  Beenhere,
-  DateRange,
-  Description,
-  PriorityHigh,
-  Title,
-} from '@mui/icons-material';
+import { DateRange, Description, PriorityHigh, Title } from '@mui/icons-material';
 import {
   Button,
   Dialog,
@@ -30,7 +24,8 @@ import { selectTaskById, selectTaskTitle, updateTask } from 'features/tasks';
 import type { UpdateTaskThunkArgType } from 'features/tasks/types';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
-import { TaskScheduleButton } from 'pages/lists/task-dialog/TaskScheduleButton';
+import { TaskPriorityControl } from 'pages/lists/task-dialog/TaskPriorityControl';
+import { TaskScheduleControl } from 'pages/lists/task-dialog/TaskScheduleControl';
 
 type ListDialogPropsType = {
   open: boolean;
@@ -64,7 +59,7 @@ export const TaskEditDialog: FC<ListDialogPropsType> = ({
       data: { description: text },
     };
 
-    return dispatch(updateTask(thunkArg)).unwrap;
+    return dispatch(updateTask(thunkArg)).unwrap();
   };
 
   const handleUpdateTaskTitle = async (text: string): Promise<any> => {
@@ -74,7 +69,7 @@ export const TaskEditDialog: FC<ListDialogPropsType> = ({
       data: { title: text },
     };
 
-    return dispatch(updateTask(thunkArg)).unwrap;
+    return dispatch(updateTask(thunkArg)).unwrap();
   };
 
   return (
@@ -87,7 +82,7 @@ export const TaskEditDialog: FC<ListDialogPropsType> = ({
         <List>
           <ListItem alignItems="flex-start">
             <ListItemIcon>
-              <Title />
+              <Title fontSize="large" />
             </ListItemIcon>
 
             <ListItemText
@@ -126,41 +121,31 @@ export const TaskEditDialog: FC<ListDialogPropsType> = ({
           </ListItem>
           <ListItem alignItems="flex-start">
             <ListItemIcon>
-              <PriorityHigh />
+              <PriorityHigh fontSize="large" />
             </ListItemIcon>
             <ListItemText
               primary="Priority"
-              secondary={
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  startIcon={<Beenhere />}
-                  sx={{ justifyContent: 'flex-start' }}
-                >
-                  {task?.priority}
-                </Button>
-              }
+              secondary={<TaskPriorityControl taskId={taskId} />}
             />
           </ListItem>
           <ListItem alignItems="flex-start">
             <ListItemIcon>
-              <DateRange />
+              <DateRange fontSize="large" />
             </ListItemIcon>
             <ListItemText
               primary="Schedule"
-              secondary={<TaskScheduleButton taskId={taskId} />}
+              secondary={<TaskScheduleControl taskId={taskId} />}
             />
           </ListItem>
           <ListItem alignItems="flex-start">
             <ListItemIcon>
-              <Description />
+              <Description fontSize="large" />
             </ListItemIcon>
             <ListItemText
               primary="Description:"
               secondary={
                 <EditableText
                   style={{
-                    // backgroundColor: 'grey',
                     textIndent: '1em',
                     minHeight: '80px',
                     padding: '10px',

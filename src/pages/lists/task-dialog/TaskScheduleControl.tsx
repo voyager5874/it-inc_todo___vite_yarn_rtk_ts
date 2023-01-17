@@ -18,7 +18,7 @@ type ScheduleButtonPropsType = {
   taskId: EntityId;
 };
 
-export const TaskScheduleButton: FC<ScheduleButtonPropsType> = ({
+export const TaskScheduleControl: FC<ScheduleButtonPropsType> = ({
   taskId,
 }): ReactElement => {
   const { startDate, deadline, status, todoListId } =

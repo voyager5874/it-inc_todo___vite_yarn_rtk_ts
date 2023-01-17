@@ -3,7 +3,7 @@ export const clearObjectEmptyData = <T extends object>(obj: T): T => {
   const keys = Object.keys(obj) as Array<keyof T>;
 
   keys.forEach(key => {
-    if (!objCopy[key]) {
+    if (objCopy[key] === undefined) {
       delete objCopy[key];
     }
   });
