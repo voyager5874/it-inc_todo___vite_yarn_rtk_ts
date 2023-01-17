@@ -5,8 +5,10 @@ import { Add } from '@mui/icons-material';
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 
+import { ListPaper } from './ListPaper';
+
 import { AddItem } from 'components/AddItem/AddItem';
-import { addList, fetchLists, ListPaper, selectListsIds } from 'features/lists';
+import { addList, fetchLists, selectListsIds } from 'features/lists';
 import { selectTasksLoadingStatus } from 'features/tasks';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 

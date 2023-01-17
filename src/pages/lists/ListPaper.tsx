@@ -19,10 +19,10 @@ import {
   selectTasksIdsByListId,
   updateList,
 } from 'features/lists';
-import { TaskCard } from 'features/tasks/TaskCard';
 import { addTask } from 'features/tasks/tasksSlice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskEditDialog } from 'pages/lists/task-dialog/TaskEditDialog';
+import { TaskCard } from 'pages/lists/TaskCard';
 import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
 import { createDummyListObject } from 'utils';
 

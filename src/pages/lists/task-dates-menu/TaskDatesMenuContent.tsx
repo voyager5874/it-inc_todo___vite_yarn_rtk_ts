@@ -1,7 +1,6 @@
 import type { ChangeEvent, FC } from 'react';
 import { useState } from 'react';
 
-import './TaskDatesMenuContent.css';
 import { Close } from '@mui/icons-material';
 import {
   Box,

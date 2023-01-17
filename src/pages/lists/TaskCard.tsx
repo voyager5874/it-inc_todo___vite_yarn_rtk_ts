@@ -22,6 +22,7 @@ import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
 import { deleteTask, selectTaskById } from 'features/tasks';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
+import { TaskCompletionBadge } from 'pages/lists/TaskCompletionBadge';
 import { createDummyTaskObject } from 'utils';
 
 type TaskCardPropsType = {
@@ -35,8 +36,8 @@ export const TaskCard: FC<TaskCardPropsType> = ({ taskId, onClick }) => {
   //   selectTaskById(state, taskId),
   // );
   const task = useAppSelector(state => selectTaskById(state, taskId));
-  const { todoListId, title, description, startDate, deadline } =
-    task || createDummyTaskObject();
+  const { todoListId, title, description, startDate, deadline, status } =
+    task || createDummyTaskObject({ title: 'error: TaskCard -> selector' });
 
   const [cardContentExpanded, setCardContentExpanded] = useState(false);
   const [underAction, setUnderAction] = useState(false);
@@ -150,6 +151,7 @@ export const TaskCard: FC<TaskCardPropsType> = ({ taskId, onClick }) => {
             </IconButton>
           </Tooltip>
         )}
+        <TaskCompletionBadge status={status} deadline={deadline} />
       </CardActions>
       <Collapse in={cardContentExpanded} timeout="auto">
         <CardContent>
