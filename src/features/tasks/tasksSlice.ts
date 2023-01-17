@@ -19,7 +19,7 @@ import { startAppListening } from 'middlewares/listenerMiddleware';
 import { SERVER_MAX_TASKS_PER_REQUEST } from 'services/api/constants';
 import { RequestResultCode } from 'services/api/enums';
 import { tasksAPI } from 'services/api/tasksAPI';
-import type { TasksEndpointPostPutModelDataType } from 'services/api/types';
+import type { TaskServerModelType } from 'services/api/types';
 import { createDummyTaskObject } from 'utils';
 import { mutablyDeleteItemFromArray } from 'utils/deleteFromArray';
 import { createDataSubmitAsyncThunk } from 'utils/typedThunkCreators';
@@ -84,26 +84,21 @@ export const updateTask = createDataSubmitAsyncThunk(
   'tasks/updateTask',
   async (apiCallData: UpdateTaskThunkArgType, { rejectWithValue, getState }) => {
     const { listId, taskId, data } = apiCallData;
-    const currentTaskData = selectTaskById(getState(), taskId);
-    let fullData: TasksEndpointPostPutModelDataType = {
-      title: currentTaskData?.title || 'title',
+
+    const currentTaskData =
+      selectTaskById(getState(), taskId) ||
+      createDummyTaskObject({ title: 'error: updateTask -> selector' });
+
+    const fullData = {
+      ...currentTaskData,
+      ...data,
     };
 
-    if (currentTaskData) {
-      const { status, order, startDate, priority, deadline, description, title } =
-        currentTaskData;
-
-      fullData = {
-        title,
-        status,
-        order,
-        startDate,
-        priority,
-        deadline,
-        description,
-        ...data,
-      };
-    }
+    // dispatch(
+    //   // probably I have to create separate file
+    //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    //   tasksSlice.actions.taskIsBeingModified({ id: taskId, changes: fullData }),
+    // );
 
     const response = await tasksAPI.updateTask(listId, taskId, fullData);
 
@@ -139,6 +134,7 @@ const initialState = tasksAdapter.getInitialState({
   filter: 'all' as 'all' | 'inProgress' | 'done',
   loading: [] as string[],
   fetchAttempts: 0,
+  asyncProcessedTask: null as TaskServerModelType | null,
 });
 
 const tasksSlice = createSlice({
@@ -148,16 +144,9 @@ const tasksSlice = createSlice({
     tasksOfAllListsRequested: state => {
       state.fetchAttempts += 1;
     },
-    // taskAdded: tasksAdapter.addOne,
-    // tasksReceived: (state, action: PayloadAction<{ tasks: TaskServerModelType[] }>) => {
-    //   const { tasks } = action.payload;
-    //
-    //   tasksAdapter.upsertMany(state, tasks);
-    //   state.sortedByListId[tasks[0].todoListId] = tasks;
-    // },
-    // tasksOfListRequested: (state, action: PayloadAction<{ listId: string }>) => {
-    //   state.loading.push(action.payload.listId);
-    // },
+    // taskIsBeingModified: tasksAdapter.updateOne,
+    // taskUpdateInProgress: tasksAdapter.addOne,
+    // taskUpdateInProgress: tasksAdapter.addOne,
     fetchTasksOfListRequestEnded: (state, action: PayloadAction<{ listId: string }>) => {
       const { listId } = action.payload;
 
@@ -203,6 +192,34 @@ const tasksSlice = createSlice({
         const taskId = taskData.id;
 
         tasksAdapter.updateOne(state, { id: taskId, changes: taskData });
+        if (state.asyncProcessedTask) {
+          state.asyncProcessedTask = null;
+        }
+      })
+      .addCase(updateTask.pending, (state, action) => {
+        const { taskId, data } = action.meta.arg;
+        const task = state.entities[taskId];
+
+        // kind of impure -- this or try/catch in updateTask thunk
+        if (task) {
+          state.asyncProcessedTask = { ...task };
+          tasksAdapter.updateOne(state, { id: taskId, changes: data });
+        }
+      })
+      .addCase(updateTask.rejected, (state, action) => {
+        const { taskId } = action.meta.arg;
+
+        // kind of impure -- this or try/catch in updateTask thunk
+        if (state.asyncProcessedTask) {
+          // get rid of proxy
+          const prevState = { ...state.asyncProcessedTask };
+
+          tasksAdapter.updateOne(state, {
+            id: taskId,
+            changes: prevState,
+          });
+          state.asyncProcessedTask = null;
+        }
       })
       // .addCase(addList.fulfilled, (state, action) => {
       //   const { id } = action.payload;
@@ -225,11 +242,6 @@ const tasksSlice = createSlice({
       .addMatcher(isAnyOf(fetchTasks.rejected, fetchTasks.fulfilled), (state, action) => {
         const listId = action.meta.arg;
 
-        // const idIndex = state.loading.indexOf(listId);
-        //
-        // if (idIndex !== -1) {
-        //   state.loading.splice(idIndex, 1);
-        // }
         mutablyDeleteItemFromArray(state.loading, listId);
       });
   },

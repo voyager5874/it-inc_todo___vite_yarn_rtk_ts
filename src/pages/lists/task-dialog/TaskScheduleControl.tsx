@@ -1,7 +1,7 @@
 import type { FC, ReactElement } from 'react';
 
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Button, Checkbox, Menu, Stack } from '@mui/material';
+import { Box, Button, Checkbox, Menu, Stack, Tooltip } from '@mui/material';
 import type { EntityId } from '@reduxjs/toolkit';
 import { format } from 'date-fns';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state';
@@ -92,10 +92,13 @@ export const TaskScheduleControl: FC<ScheduleButtonPropsType> = ({
       {deadline ? (
         <Stack alignItems="flex-start" gap={2}>
           <Stack direction="row">
-            <Checkbox
-              checked={status === TaskStatus.Completed}
-              onChange={handleTaskStatusUpdate}
-            />
+            <Tooltip title="Mark as completed">
+              <Checkbox
+                checked={status === TaskStatus.Completed}
+                onChange={handleTaskStatusUpdate}
+              />
+            </Tooltip>
+
             <Button
               variant="outlined"
               sx={{ justifyContent: 'flex-start' }}
@@ -103,9 +106,6 @@ export const TaskScheduleControl: FC<ScheduleButtonPropsType> = ({
               endIcon={<KeyboardArrowDown />}
             >
               {renderScheduleButtonContent()}
-              {/* <Badge sx={{ backgroundColor: 'green', marginLeft: '20px' }}> */}
-              {/*  {status === TaskStatus.Completed && 'Выполнено'} */}
-              {/* </Badge> */}
               <TaskCompletionBadge status={status} deadline={deadline} />
             </Button>
           </Stack>

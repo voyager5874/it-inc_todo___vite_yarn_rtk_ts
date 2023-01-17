@@ -8,11 +8,12 @@ export const createDummyTaskObject = (
   data: Partial<TaskServerModelType> = {},
 ): TaskServerModelType => {
   const dateTime = new Date(0).toISOString();
+  // const deadline = addDays(new Date(), 365).toISOString();
 
   return {
     id: nanoid(),
     todoListId: nanoid(),
-    deadline: dateTime,
+    deadline: null,
     startDate: dateTime,
     addedDate: dateTime,
     title: 'this task is a sign of some error',

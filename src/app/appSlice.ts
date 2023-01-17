@@ -67,8 +67,6 @@ const appSlice = createSlice({
           updateList.rejected,
         ),
         (state, action) => {
-          console.log(action.payload);
-          console.log(action);
           if (action.payload?.messages.length) {
             state.error = action.payload.messages.join(', ');
           } else if (action.error.message) {
