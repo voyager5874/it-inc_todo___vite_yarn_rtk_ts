@@ -19,6 +19,7 @@ import { bindContextMenu, bindMenu, bindTrigger } from 'material-ui-popup-state'
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import { TEMPORARY_TASK_ID } from 'constants/optimisticUI';
+import { TASK_DESCRIPTION_ALWAYS_SHOW_LENGTH } from 'constants/settings';
 import { deleteTask, selectTaskById } from 'features/tasks';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { TaskDatesMenuContent } from 'pages/lists/task-dates-menu/TaskDatesMenuContent';
@@ -130,18 +131,18 @@ export const TaskCard: FC<TaskCardPropsType> = ({ taskId, onClick }) => {
       {/*  image="https://img.freepik.com/free-photo/blue-iguana-closeup-on-wood_488145-647.jpg?w=2000" */}
       {/*  alt="green iguana" */}
       {/* /> */}
-      <CardContent>
+      <CardContent sx={{ pb: 0.1, mb: 0 }}>
         <Typography gutterBottom variant="subtitle1" component="div">
           {title}
         </Typography>
-        {description && description.length < 50 && (
+        {description && description.length <= TASK_DESCRIPTION_ALWAYS_SHOW_LENGTH && (
           <Typography paragraph color="text.secondary">
             {description}
           </Typography>
         )}
       </CardContent>
-      <CardActions disableSpacing>
-        {description && description.length > 50 && (
+      <CardActions disableSpacing sx={{ p: 1 }}>
+        {description && description.length > TASK_DESCRIPTION_ALWAYS_SHOW_LENGTH && (
           <Tooltip title="this task has description">
             <IconButton
               sx={{ borderRadius: '4px', zIndex: '10' }}
