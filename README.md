@@ -1,10 +1,10 @@
-<div style="text-align: center">
-<img src="public/todolist.svg" alt="logo" style="max-width: 300px">
+<div align="center">
+<img src="public/todolist.svg" alt="logo" style="max-width: 300px" width="250px">
 </div>
 
-<h1 style="text-align: center; font-size: 7vw">Task tracker</h1>
+# <h1 align="center">Task tracker</h1>
 
-<p style="text-align: center; font-size: 3vw">Yet another todo app.</p>
+## <p align="center">Yet another todo app.</p>
 
 
 ## Screenshots
