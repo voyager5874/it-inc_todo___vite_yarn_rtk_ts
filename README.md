@@ -1,7 +1,10 @@
+<div style="text-align: center">
+<img src="public/todolist.svg" alt="logo" style="max-width: 300px">
+</div>
 
-# Task tracker
+<h1 style="text-align: center; font-size: 7vw">Task tracker</h1>
 
-Yet another todo app.
+<p style="text-align: center; font-size: 3vw">Yet another todo app.</p>
 
 
 ## Screenshots
@@ -9,8 +12,8 @@ Yet another todo app.
 [//]: # (![app main page]&#40;public/app-main-page.png&#41;)
 [//]: # (![task edit dialog]&#40;public/task-edit-dialog.png&#41;)
 <div style="display: flex; flex-wrap: wrap; width: 100%; justify-content: center; gap: 20px">
-    <img src="public/app-main-page.png" style="aspect-ratio: auto; max-width: 900px"/>
-    <img src="public/task-edit-dialog.png" style="aspect-ratio: auto; max-width: 600px"/>
+    <img src="public/app-main-page.png" style="aspect-ratio: auto; max-width: 900px" alt="app screenshot"/>
+    <img src="public/task-edit-dialog.png" style="aspect-ratio: auto; max-width: 600px" alt="app screenshot"/>
 </div>
 
 
