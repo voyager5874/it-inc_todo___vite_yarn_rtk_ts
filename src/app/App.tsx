@@ -11,55 +11,14 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { createHashRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 
 import { selectAppInitializationStatus } from 'app/appSlice';
+import { routerConfig } from 'app/routerConfig';
 import { authenticateUser } from 'features/user/userSlice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
-import { RootLayout } from 'layouts';
-import { DefaultLayout } from 'layouts/DefaultLayout';
-import { NotFound } from 'pages';
-import { ListsPage } from 'pages/lists/ListsPage';
-import { LoginPage } from 'pages/login/LoginPage';
-import { UserPage } from 'pages/user/UserPage';
 
-const router = createHashRouter([
-  {
-    path: '/',
-    element: <RootLayout />,
-    errorElement: <NotFound />,
-    children: [
-      { index: true, element: <Navigate to="/lists" /> },
-      {
-        path: '/login',
-        element: <LoginPage />,
-        // errorElement: <NotFound />,
-      },
-      {
-        path: '/lists',
-        element: <DefaultLayout />,
-        // errorElement: <NotFound />,
-        children: [
-          {
-            index: true,
-            element: <ListsPage />,
-          },
-        ],
-      },
-      {
-        path: '/user',
-        element: <DefaultLayout />,
-        // errorElement: <NotFound />,
-        children: [
-          {
-            index: true,
-            element: <UserPage />,
-          },
-        ],
-      },
-    ],
-  },
-]);
+const router = createHashRouter(routerConfig);
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
